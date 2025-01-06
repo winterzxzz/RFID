@@ -50,7 +50,7 @@ const DevicesPage = () => {
     const handleModalSubmit = async () => {
         try {
             const values = await form.validateFields();
-            if (editingUser) {
+            if (editingDevice) {
                 // Handle update
                 const response = await apiClient.put(`/devices/${editingDevice.id}`, values);
                 if (response.data.status_code === 200) {
@@ -65,6 +65,17 @@ const DevicesPage = () => {
                 }
             }
             setIsModalVisible(false);
+        } catch (error) {
+            toast.error('Error: ' + error.message);
+        }
+    };
+
+    const handleUpdate = async (device) => {
+        try {
+            const response = await apiClient.put(`/devices/${device.id}`, device);
+            if (response.data.status_code === 200) {
+                fetchDevices();
+            }
         } catch (error) {
             toast.error('Error: ' + error.message);
         }
@@ -138,12 +149,14 @@ const DevicesPage = () => {
                                 {/* toggle device mode */}
                                 <td style={{ display: 'flex', justifyContent: 'start', gap: '10px' }}>
                                     <Button
+                                        onClick={() => handleUpdate({ ...device, device_mode: device.device_mode === 0 ? 1 : 0 })}
                                         type={device.device_mode === 0 ? 'primary' : 'default'}
                                     >
                                         Enrollment
                                     </Button>
 
                                     <Button
+                                        onClick={() => handleUpdate({ ...device, device_mode: device.device_mode === 1 ? 0 : 1 })}
                                         type={device.device_mode === 1 ? 'primary' : 'default'}
                                     >
                                         Attendance
@@ -184,39 +197,24 @@ const DevicesPage = () => {
                     layout="vertical"
                 >
                     <Form.Item
-                        name="name"
+                        name="device_name"
                         label="Name"
-                        rules={[{ required: true, message: 'Please input name!' }]}
+                        rules={[{ required: true, message: 'Please input name!', }]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
-                        name="department"
+                        name="device_dep"
                         label="Department"
                         rules={[{ required: true, message: 'Please input department!' }]}
                     >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="uid"
-                        label="UID"
-                        rules={[{ required: true, message: 'Please input UID!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="mode"
-                        label="Mode"
-                        rules={[{ required: true, message: 'Please input mode!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="config"
-                        label="Config"
-                        rules={[{ required: true, message: 'Please input config!' }]}
-                    >
-                        <Input />
+                        <Select
+                            placeholder="Select department"
+                        >
+                            <Select.Option value="CTX">CTX</Select.Option>
+                            <Select.Option value="ATTZ">ATTZ</Select.Option>
+                            <Select.Option value="DTVTC">DTVTC</Select.Option>
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>

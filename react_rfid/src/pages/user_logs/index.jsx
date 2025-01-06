@@ -13,7 +13,6 @@ const UserLogs = () => {
   const [departments, setDepartments] = useState([]);
   const [department, setDepartment] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-  const [socket, setSocket] = useState(null);
 
   // Filter and export function
   const handleExport = () => {
@@ -35,10 +34,10 @@ const UserLogs = () => {
   useEffect(() => {
     // Initialize socket connection
     const newSocket = io('http://localhost:3000'); // adjust URL to match your server
-    setSocket(newSocket);
 
     // Listen for new logs
-    newSocket.on('message', (newLog) => {
+    newSocket.on('attendance', (newLog) => {
+        toast.success(newLog.message);
         fetchUserLogs();
     });
 

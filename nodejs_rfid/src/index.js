@@ -14,7 +14,6 @@ dotenv.config();
 
 
 // Add JWT secret key to your environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';  // Better to use environment variable
 
 // Create MySQL connection
 const db = mysql.createConnection({
@@ -72,25 +71,24 @@ server.listen(3000, () => {
 
 // Add middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-
-    if (!token) {
-        return res.status(403).json({
-            status_code: 403,
-            message: 'A token is required for authentication',
-        });
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.admin = decoded;
-        next();
-    } catch (err) {
-        return res.status(401).json({
-            status_code: 401,
-            message: 'Invalid Token',
-        });
-    }
+    // get all devices, only device have device_uid in database can be accessd
+    const query = 'SELECT * FROM devices';
+    // db.query(query, (err, result) => {
+    //     if (err) {
+    //         return res.status(500).json({
+    //             status_code: 500,
+    //             message: 'Error getting devices',
+    //         });
+    //     }
+    //     const devices = result.map(device => device.device_uid);
+    //     if (!devices.includes(req.headers['device_uid'])) {
+    //         return res.status(403).json({
+    //             status_code: 403,
+    //             message: 'Unauthorized',
+    //         });
+    //     }
+    // });
+    next();
 };
 
 // Example of protected route using the middleware
@@ -165,7 +163,7 @@ app.post('/change-password', verifyToken, (req, res) => {
 
 // get all users
 app.get('/users', verifyToken, (req, res) => {
-    const query = 'SELECT * FROM users';
+    const query = 'SELECT * FROM users ORDER BY id DESC';
     db.query(query, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -206,10 +204,10 @@ app.post('/users', verifyToken, (req, res) => {
 // update user
 app.put('/users/:id', verifyToken, (req, res) => {
     const userId = req.params.id;
-    const { username, serialnumber, gender, email, card_uid, device_uid, device_dep } = req.body;
-    const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, card_uid = ?, device_uid = ?, device_dep = ? WHERE id = ?';
+    const { username, serialnumber, gender, email,  device_dep } = req.body;
+    const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, device_dep = ?, add_card = ? WHERE id = ?';
     
-    db.query(query, [username, serialnumber, gender, email, card_uid, device_uid, device_dep, userId], (err, result) => {
+    db.query(query, [username, serialnumber, gender, email, device_dep, 1, userId], (err, result) => {
         if (err) {
             console.log(err);
             return res.status(500).json({
@@ -280,10 +278,15 @@ app.get('/devices', verifyToken, (req, res) => {
 
 // add new device
 app.post('/devices', verifyToken, (req, res) => {
-    const { device_name, device_dep, device_uid } = req.body;
+    const { device_name, device_dep } = req.body;
     const query = 'INSERT INTO devices (device_name, device_dep, device_uid, device_date) VALUES (?, ?, ?, CURDATE())';
+
+    // 8f19e31055c56b05 random uid
+    const device_uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    // 2021-06-21
+    const device_date = new Date().toISOString().split('T')[0];
     
-    db.query(query, [device_name, device_dep, device_uid], (err, result) => {
+    db.query(query, [device_name, device_dep, device_uid, device_date], (err, result) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
@@ -302,10 +305,11 @@ app.post('/devices', verifyToken, (req, res) => {
 // update device
 app.put('/devices/:id', verifyToken, (req, res) => {
     const deviceId = req.params.id;
-    const { device_name, device_dep, device_uid } = req.body;
-    const query = 'UPDATE devices SET device_name = ?, device_dep = ?, device_uid = ? WHERE id = ?';
+    const { device_name, device_dep, device_uid, device_mode } = req.body;
+    console.log(req.body);
+    const query = 'UPDATE devices SET device_name = ?, device_dep = ?, device_uid = ?, device_mode = ? WHERE id = ?';
     
-    db.query(query, [device_name, device_dep, device_uid, deviceId], (err, result) => {
+    db.query(query, [device_name, device_dep, device_uid, device_mode, deviceId], (err, result) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
@@ -355,8 +359,8 @@ app.delete('/devices/:id', verifyToken, (req, res) => {
 
 // get all users log
 app.get('/users-log', verifyToken, (req, res) => {
-    // sort by date desc
-    const query = 'SELECT * FROM users_logs ORDER BY checkindate DESC';
+    // sort by date desc if the same date, sort by timeout desc
+    const query = 'SELECT * FROM users_logs ORDER BY checkindate DESC, timeout DESC';
     db.query(query, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -391,7 +395,7 @@ app.post('/users-log', verifyToken, async (req, res) => {
         if (!device) {
             return res.status(400).json({
                 status_code: 400,
-                message: 'Invalid Device!',
+                message: 'Unauthorized!',
             });
         }
 
@@ -441,13 +445,13 @@ app.post('/users-log', verifyToken, async (req, res) => {
                     'INSERT INTO users_logs (username, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                     [user.username, user.serialnumber, card_uid, device_uid, device_dep, currentDate, currentTime, '00:00:00']
                 );
-                io.emit('message', {
+                io.emit('attendance', {
                     status_code: 200,
-                    message: 'login ' + user.username,
+                    message: 'Check in ' + user.username,
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'login ' + user.username,
+                    message: 'Check in ' + user.username,
                 });
             } else {
                 // Update the last log's timeout
@@ -455,13 +459,13 @@ app.post('/users-log', verifyToken, async (req, res) => {
                     'UPDATE users_logs SET timeout = ? WHERE card_uid = ? AND checkindate = ? AND id = ?',
                     [currentTime, card_uid, currentDate, existingLog.id]
                 );
-                io.emit('message', {
+                io.emit('attendance', {
                     status_code: 200,
-                    message: 'logout ' + user.username,
+                    message: 'Check out ' + user.username,
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'logout ' + user.username,
+                    message: 'Check out ' + user.username,
                 });
             }
         }
@@ -473,27 +477,37 @@ app.post('/users-log', verifyToken, async (req, res) => {
             if (existingCard) {
                 await db.promise().query('UPDATE users SET card_select = 0');
                 await db.promise().query('UPDATE users SET card_select = 1 WHERE card_uid = ?', [card_uid]);
-                io.emit('message', {
-                    status_code: 200,
-                    message: 'available',
+                io.emit('add-card', {
+                    status_code: 400,
+                    message: 'Card ' + card_uid + ' is available',
                 });
-                return res.status(200).json({
-                    status_code: 200,
-                    message: 'available',
+                return res.status(400).json({
+                    status_code: 400,
+                    message: 'Card ' + card_uid + ' is available',
                 });
             } else {
                 await db.promise().query('UPDATE users SET card_select = 0');
-                await db.promise().query(
+                // First insert the new user
+                const [result] = await db.promise().query(
                     'INSERT INTO users (card_uid, card_select, device_uid, device_dep, user_date) VALUES (?, 1, ?, ?, CURDATE())',
                     [card_uid, device_uid, device_dep]
                 );
-                io.emit('message', {
+                // Then fetch the newly created user
+                const [newUsers] = await db.promise().query(
+                    'SELECT * FROM users WHERE id = ?',
+                    [result.insertId]
+                );
+                const newUser = newUsers[0];
+                console.log(newUser);
+                io.emit('add-card', {
                     status_code: 200,
-                    message: 'succesful',
+                    message: 'Add Card ' + card_uid,
+                    data: newUser
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'succesful',
+                    message: 'Add Card ' + card_uid,
+                    data: newUser
                 });
             }
         }

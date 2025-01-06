@@ -5,11 +5,11 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '../../configs/api_client';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [form] = Form.useForm();
@@ -18,6 +18,23 @@ const UserList = () => {
     // Fetch users data
     useEffect(() => {
         fetchUsers();
+    }, []);
+
+    useEffect(() => {
+        // Initialize socket connection
+        const newSocket = io('http://localhost:3000');
+    
+        // Listen for new logs
+        newSocket.on('add-card', (newLog) => {
+            if(newLog.status_code === 200) {
+                toast.success(newLog.message);
+                setUsers(prevUsers => [newLog.data, ...prevUsers]);
+            } else {
+                toast.warning(newLog.message);
+            }
+        });
+    
+        return () => newSocket.disconnect();
     }, []);
 
     const fetchUsers = async () => {
@@ -152,7 +169,13 @@ const UserList = () => {
                     </thead>
                     <tbody>
                         {users.map(user => (
-                            <tr key={user.id}>
+                            <tr 
+                                key={user.id}
+                                style={{
+                                    backgroundColor: user.add_card == 0 ? '#ffebcc' : 'transparent',
+                                    color: user.add_card == 0 ? 'black' : 'inherit'
+                                }}
+                            >
                                 <td>{user.id} | {user.username}</td>
                                 <td>{user.serialnumber}</td>
                                 <td>{user.gender}</td>
@@ -226,9 +249,9 @@ const UserList = () => {
                         </Select>
                     </Form.Item>
                     <Form.Item
-                        name="card_uid"
-                        label="Card UID"
-                        rules={[{ required: true, message: 'Please input card UID!' }]}
+                        name="email"
+                        label="Email"
+                        rules={[{ required: true, message: 'Please input email!' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -240,9 +263,9 @@ const UserList = () => {
                         <Select
                             placeholder="Select device"
                         >
-                            <Select.Option value="ctx">CTX</Select.Option>
-                            <Select.Option value="attz">ATTZ</Select.Option>
-                            <Select.Option value="dtvtc">DTVTC</Select.Option>
+                            <Select.Option value="CTX">CTX</Select.Option>
+                            <Select.Option value="ATTZ">ATTZ</Select.Option>
+                            <Select.Option value="DTVTC">DTVTC</Select.Option>
                         </Select>
                     </Form.Item>
                 </Form>
