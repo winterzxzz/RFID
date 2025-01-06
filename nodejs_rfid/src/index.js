@@ -360,7 +360,7 @@ app.delete('/devices/:id', verifyToken, (req, res) => {
 // get all users log
 app.get('/users-log', verifyToken, (req, res) => {
     // sort by date desc if the same date, sort by timeout desc
-    const query = 'SELECT * FROM users_logs ORDER BY checkindate DESC, timeout DESC';
+    const query = 'SELECT * FROM users_logs ORDER BY id DESC';
     db.query(query, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -431,16 +431,16 @@ app.post('/users-log', verifyToken, async (req, res) => {
             const currentDate = moment().format('YYYY-MM-DD');
             const currentTime = moment().format('HH:mm:ss');
 
-            // Check if user already has any log today
+            // Check if user has an incomplete log (no timeout) for today
             const [logs] = await db.promise().query(
-                'SELECT * FROM users_logs WHERE card_uid = ? AND checkindate = ? ORDER BY id DESC LIMIT 1',
+                'SELECT * FROM users_logs WHERE card_uid = ? AND checkindate = ? AND timeout = "00:00:00" ORDER BY id DESC LIMIT 1',
                 [card_uid, currentDate]
             );
-            const existingLog = logs[0];
+            const incompleteLog = logs[0];
 
             // Handle login/logout
-            if (!existingLog) {
-                // First check-in of the day
+            if (!incompleteLog) {
+                // Create new check-in entry
                 await db.promise().query(
                     'INSERT INTO users_logs (username, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                     [user.username, user.serialnumber, card_uid, device_uid, device_dep, currentDate, currentTime, '00:00:00']
@@ -454,10 +454,10 @@ app.post('/users-log', verifyToken, async (req, res) => {
                     message: 'Check in ' + user.username,
                 });
             } else {
-                // Update the last log's timeout
+                // Complete the existing check-in with a timeout
                 await db.promise().query(
-                    'UPDATE users_logs SET timeout = ? WHERE card_uid = ? AND checkindate = ? AND id = ?',
-                    [currentTime, card_uid, currentDate, existingLog.id]
+                    'UPDATE users_logs SET timeout = ? WHERE id = ?',
+                    [currentTime, incompleteLog.id]
                 );
                 io.emit('attendance', {
                     status_code: 200,
