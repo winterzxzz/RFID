@@ -29,7 +29,7 @@ const DevicesPage = () => {
                 toast.error(data['message']);
             }
         } catch (error) {
-            toast.error('Failed to fetch devices: ' + error.message);
+            toast.error(error.response.data.message);
         } finally {
             setIsLoading(false);
         }
@@ -66,7 +66,7 @@ const DevicesPage = () => {
             }
             setIsModalVisible(false);
         } catch (error) {
-            toast.error('Error: ' + error.message);
+            toast.error(error.response.data.message);
         }
     };
 
@@ -77,7 +77,7 @@ const DevicesPage = () => {
                 fetchDevices();
             }
         } catch (error) {
-            toast.error('Error: ' + error.message);
+            toast.error(error.response.data.message);
         }
     };
 
@@ -97,7 +97,7 @@ const DevicesPage = () => {
                         toast.error(response.data.message);
                     }
                 } catch (error) {
-                    toast.error('Error deleting device: ' + error.message);
+                    toast.error(error.response.data.message);
                 }
             }
         });

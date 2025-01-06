@@ -48,7 +48,7 @@ const UserList = () => {
                 toast.error(data['message']);
             }
         } catch (error) {
-            toast.error('Failed to fetch users: ' + error.message);   
+            toast.error(error.response.data.message);   
         } finally {
             setLoading(false);
         }
@@ -103,7 +103,7 @@ const UserList = () => {
             fetchUsers();
             setIsModalVisible(false);
         } catch (error) {
-            toast.error('Error: ' + error.message);
+            toast.error(error.response.data.message);
         }
     };
 
@@ -124,7 +124,7 @@ const UserList = () => {
                         toast.error(response.data.message);
                     }
                 } catch (error) {
-                    toast.error('Error deleting user: ' + error.message);
+                    toast.error(error.response.data.message);
                 }
             }
         });
@@ -147,13 +147,13 @@ const UserList = () => {
             <main>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <h2>HERE ARE ALL THE USERS</h2>
-                    <Button 
+                    {/* <Button 
                         type="primary" 
                         icon={<PlusOutlined />}
                         onClick={handleAdd}
                     >
                         Add User
-                    </Button>
+                    </Button> */}
                 </div>
                 <table>
                     <thead>
@@ -244,8 +244,8 @@ const UserList = () => {
                         <Select
                             placeholder="Select gender"
                         >
-                            <Select.Option value="male">Male</Select.Option>
-                            <Select.Option value="female">Female</Select.Option>
+                            <Select.Option value="Male">Male</Select.Option>
+                            <Select.Option value="Female">Female</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item

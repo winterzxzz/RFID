@@ -21,7 +21,7 @@ function App() {
         </header>
 
         <Routes>
-          <Route path="/users" element={<UserList />} />
+          <Route path="/" element={<UserList />} />
           <Route path="/users-log" element={<UserLogs />} />
           <Route path="/devices" element={<DevicesPage />} />
           <Route path="/login" element={<Login />} />

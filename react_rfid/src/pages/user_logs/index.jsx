@@ -60,7 +60,7 @@ const UserLogs = () => {
         toast.error(data['message']);
       }
     } catch (error) {
-      toast.error('Failed to fetch user logs: ' + error.message);
+      toast.error(error.response.data.message);
     } finally {
       setLoading(false);
     }

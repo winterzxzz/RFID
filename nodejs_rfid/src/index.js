@@ -11,6 +11,8 @@ const { Server } = require('socket.io');
 const moment = require('moment');
 dotenv.config();
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
 
 
 // Add JWT secret key to your environment variables
@@ -71,24 +73,25 @@ server.listen(3000, () => {
 
 // Add middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-    // get all devices, only device have device_uid in database can be accessd
-    const query = 'SELECT * FROM devices';
-    // db.query(query, (err, result) => {
-    //     if (err) {
-    //         return res.status(500).json({
-    //             status_code: 500,
-    //             message: 'Error getting devices',
-    //         });
-    //     }
-    //     const devices = result.map(device => device.device_uid);
-    //     if (!devices.includes(req.headers['device_uid'])) {
-    //         return res.status(403).json({
-    //             status_code: 403,
-    //             message: 'Unauthorized',
-    //         });
-    //     }
-    // });
-    next();
+    const token = req.headers['authorization']?.split(' ')[1];
+
+    if (!token) {
+        return res.status(403).json({
+            status_code: 403,
+            message: 'A token is required for authentication',
+        });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.admin = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({
+            status_code: 401,
+            message: 'Invalid Token',
+        });
+    }
 };
 
 // Example of protected route using the middleware
@@ -180,53 +183,52 @@ app.get('/users', verifyToken, (req, res) => {
 });
 
 
-// add new user
-app.post('/users', verifyToken, (req, res) => {
-    const { username, serialnumber, gender, email, card_uid, device_uid, device_dep } = req.body;
-    const query = 'INSERT INTO users (username, serialnumber, gender, email, card_uid, device_uid, device_dep, user_date) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE())';
-    
-    db.query(query, [username, serialnumber, gender, email, card_uid, device_uid, device_dep], (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                status_code: 500,
-                message: 'Error adding user',
-                error: err.message
-            });
-        }
-        res.status(201).json({
-            status_code: 201,
-            message: 'User added successfully',
-            data: { id: result.insertId }
-        });
-    });
-});
-
 // update user
-app.put('/users/:id', verifyToken, (req, res) => {
+app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
     const { username, serialnumber, gender, email,  device_dep } = req.body;
     const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, device_dep = ?, add_card = ? WHERE id = ?';
-    
-    db.query(query, [username, serialnumber, gender, email, device_dep, 1, userId], (err, result) => {
+
+    // check if serialnumber is already in use
+    const query_check = 'SELECT * FROM users WHERE serialnumber = ?';
+    db.query(query_check, [serialnumber], (err, result) => {
         if (err) {
-            console.log(err);
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error updating user',
+                message: 'Error checking serialnumber',
                 error: err.message
             });
         }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({
-                status_code: 404,
-                message: 'User not found'
+        if (result.length > 0) {
+            return res.status(400).json({
+                status_code: 400,
+                message: 'Serialnumber already in use',
+            });
+        } else {
+            db.query(query, [username, serialnumber, gender, email, device_dep, 1, userId], (err, result) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({
+                        status_code: 500,
+                        message: 'Error updating user',
+                        error: err.message
+                    });
+                }
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({
+                        status_code: 404,
+                        message: 'User not found'
+                    });
+                }
+                res.status(200).json({
+                    status_code: 200,
+                    message: 'User updated successfully'
+                });
             });
         }
-        res.status(200).json({
-            status_code: 200,
-            message: 'User updated successfully'
-        });
+        
     });
+    
 });
 
 // delete user
@@ -377,7 +379,7 @@ app.get('/users-log', verifyToken, (req, res) => {
 });
 
 // add user log
-app.post('/users-log', verifyToken, async (req, res) => {
+app.post('/users-log', async (req, res) => {
     const { card_uid, device_uid } = req.query;
     
     if (!card_uid || !device_uid) {
