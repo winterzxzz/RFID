@@ -189,44 +189,25 @@ app.put('/users/:id', (req, res) => {
     const { username, serialnumber, gender, email,  device_dep } = req.body;
     const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, device_dep = ?, add_card = ? WHERE id = ?';
 
-    // check if serialnumber is already in use
-    const query_check = 'SELECT * FROM users WHERE serialnumber = ?';
-    db.query(query_check, [serialnumber], (err, result) => {
+    db.query(query, [username, serialnumber, gender, email, device_dep, 1, userId], (err, result) => {
         if (err) {
+            console.log(err);
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error checking serialnumber',
+                message: 'Error updating user',
                 error: err.message
             });
         }
-        if (result.length > 0) {
-            return res.status(400).json({
-                status_code: 400,
-                message: 'Serialnumber already in use',
-            });
-        } else {
-            db.query(query, [username, serialnumber, gender, email, device_dep, 1, userId], (err, result) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({
-                        status_code: 500,
-                        message: 'Error updating user',
-                        error: err.message
-                    });
-                }
-                if (result.affectedRows === 0) {
-                    return res.status(404).json({
-                        status_code: 404,
-                        message: 'User not found'
-                    });
-                }
-                res.status(200).json({
-                    status_code: 200,
-                    message: 'User updated successfully'
-                });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                status_code: 404,
+                message: 'User not found'
             });
         }
-        
+        res.status(200).json({
+            status_code: 200,
+            message: 'User updated successfully'
+        });
     });
     
 });

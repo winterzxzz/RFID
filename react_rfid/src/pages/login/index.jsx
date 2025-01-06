@@ -32,7 +32,7 @@ const Login = () => {
         if(response.status === 200) {
             toast.success('Login successful!');
             localStorage.setItem('token', response.data.token);
-            navigate('/');
+            navigate('/users');
         }
         console.log(response);
     } catch (err) {

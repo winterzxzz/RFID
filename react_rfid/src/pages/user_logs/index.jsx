@@ -136,10 +136,11 @@ const UserLogs = () => {
           className="w-48"
           options={departments.map(dep => ({ value: dep, label: dep }))}
         />
-        <Button type="primary" onClick={handleFilter} className="bg-teal-600">
+        
+        <Button type="primary" onClick={handleFilter} className="bg-teal-600 text-white m-2">
           Filter
         </Button>
-        <Button type="primary" onClick={handleExport} className="bg-teal-600">
+        <Button type="primary" onClick={handleExport} className="bg-teal-600 text-white">
           Export to Excel
         </Button>
       </div>

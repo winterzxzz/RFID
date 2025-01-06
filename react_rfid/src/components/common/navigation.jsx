@@ -25,7 +25,7 @@ function Navigation() {
     if(isLoggedIn) {
         return (
             <nav>
-                <button onClick={() => navigate('/')}>Users</button>
+                <button onClick={() => navigate('/users')}>Users</button>
                 <button onClick={() => navigate('/users-log')}>Users Log</button>
                 <button onClick={() => navigate('/devices')}>Devices</button>
                 <button onClick={handleLogout}>Log Out</button>
