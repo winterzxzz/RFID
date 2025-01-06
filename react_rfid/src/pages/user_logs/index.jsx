@@ -126,21 +126,31 @@ const UserLogs = () => {
           onChange={(dates) => {
             setDateRange(dates);
           }}
-          className="w-64"
+          style={{ width: '256px', margin: '8px' }}
         />
+
+
         <Select
           placeholder="Select Department"
           onChange={(value) => {
             setDepartment(value);
           }}
-          className="w-48"
+          style={{ width: '192px' }}
           options={departments.map(dep => ({ value: dep, label: dep }))}
         />
         
-        <Button type="primary" onClick={handleFilter} className="bg-teal-600 text-white m-2">
+        <Button 
+          type="primary" 
+          onClick={handleFilter} 
+          style={{ backgroundColor: '#0d9488', margin: '8px' }}
+        >
           Filter
         </Button>
-        <Button type="primary" onClick={handleExport} className="bg-teal-600 text-white">
+        <Button 
+          type="primary" 
+          onClick={handleExport} 
+          style={{ backgroundColor: '#0d9488' }}
+        >
           Export to Excel
         </Button>
       </div>
