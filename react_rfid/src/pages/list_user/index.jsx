@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Modal, Form, Input, Select } from 'antd';
+import { Table, Space, Button, Modal, Form, Input, Select, Pagination    } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '../../configs/api_client';
@@ -13,12 +13,13 @@ const UserList = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [form] = Form.useForm();
-
-
-    // Fetch users data
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+    const [departments, setDepartments] = useState([]);
+    const [pagination, setPagination] = useState({
+        total: 0,
+        totalPages: 0,
+        currentPage: 1,
+        limit: 10
+    });
 
     useEffect(() => {
         // Initialize socket connection
@@ -37,13 +38,22 @@ const UserList = () => {
         return () => newSocket.disconnect();
     }, []);
 
-    const fetchUsers = async () => {
+    // Fetch users data
+    useEffect(() => {
+        fetchUsers(pagination.currentPage, pagination.limit);
+    }, [pagination.currentPage, pagination.limit]);
+
+
+    const fetchUsers = async (page, limit) => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/users');
+            console.log(page, limit);
+            const response = await apiClient.get(`/users?page=${page}&limit=${limit}`);
             const data = response.data;
             if(data['status_code'] == 200) {
-                setUsers([...data['data']]);
+                setUsers([...data['data']['items']]);
+                setPagination(data['data']['pagination']);
+                setDepartments(data['data']['departments']);
             } else {
                 toast.error(data['message']);
             }
@@ -54,17 +64,13 @@ const UserList = () => {
         }
     };
 
+
     const handleEdit = (user) => {
         setEditingUser(user);
         form.setFieldsValue(user);
         setIsModalVisible(true);
     };
 
-    const handleAdd = () => {
-        setEditingUser(null);
-        form.resetFields();
-        setIsModalVisible(true);
-    };
 
     const handleModalSubmit = async () => {
         try {
@@ -75,30 +81,28 @@ const UserList = () => {
                     username: values.username,
                     serialnumber: values.serialnumber,
                     gender: values.gender,
-                    email: editingUser.email,
-                    card_uid: values.card_uid,
-                    device_uid: editingUser.device_uid,
-                    device_dep: values.device_dep
+                    email: values.email,
+                    device_uid: values.device_uid
                 });
                 if (response.data.status_code === 200) {
-                    toast.success('User updated successfully');
+                    toast.success('Sửa thông tin sinh viên thành công');
                     setUsers(users.map(user => user.id === editingUser.id ? response.data.data : user));
                 }
             } else {
                 // Handle create
-                const response = await apiClient.post('/users', {
-                    username: values.username,
-                    serialnumber: values.serialnumber,
-                    gender: values.gender,
-                    email: editingUser.email,
-                    card_uid: values.card_uid,
-                    device_uid: editingUser.device_uid,
-                    device_dep: values.device_dep
-                });
-                if (response.data.status_code === 200) {
-                    toast.success('User created successfully');
-                    setUsers([...users, response.data.data]);
-                }
+                // const response = await apiClient.post('/users', {
+                //     username: values.username,
+                //     serialnumber: values.serialnumber,
+                //     gender: values.gender,
+                //     email: editingUser.email,
+                //     card_uid: values.card_uid,
+                //     device_uid: editingUser.device_uid,
+                //     device_dep: values.device_dep
+                // });
+                // if (response.data.status_code === 200) {
+                //     toast.success('Thêm sinh viên thành công');
+                //     setUsers([...users, response.data.data]);
+                // }
             }
             fetchUsers();
             setIsModalVisible(false);
@@ -109,16 +113,16 @@ const UserList = () => {
 
     const handleDelete = async (userId) => {
         Modal.confirm({
-            title: 'Are you sure you want to delete this user?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes',
+            title: 'Bạn có chắc chắn muốn xoá sinh viên này?',
+            content: 'Hành động này không thể hoàn tác.',
+            okText: 'Xoá',
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: 'Hủy',
             onOk: async () => {
                 try {
                     const response = await apiClient.delete(`/users/${userId}`);
                     if (response.data.status_code === 200) {
-                        toast.success('User deleted successfully');
+                        toast.success('Xoá sinh viên thành công');
                         fetchUsers();
                     } else {
                         toast.error(response.data.message);
@@ -137,7 +141,7 @@ const UserList = () => {
         </div>;
     } else {
         if(users.length === 0) {
-            return <div>No users found</div>;
+            return <div>Không có dữ liệu</div>;
         }
     }
     
@@ -146,25 +150,39 @@ const UserList = () => {
         <div style={{ padding: '24px' }}>
             <main>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h2>HERE ARE ALL THE USERS</h2>
-                    {/* <Button 
-                        type="primary" 
-                        icon={<PlusOutlined />}
-                        onClick={handleAdd}
-                    >
-                        Add User
-                    </Button> */}
+                    <h2>DANH SÁCH SINH VIÊN</h2>
+                    
+                    <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Pagination
+                        current={pagination.currentPage}
+                        pageSize={pagination.limit}
+                        total={pagination.total}
+                        pageSizeOptions={['10', '20', '30', '40', '50']}
+                        onChange={(page, size) => {
+                            setPagination({
+                                ...pagination,
+                                currentPage: page,
+                                limit: size
+                            });
+                        }}
+                        showSizeChanger
+                        showQuickJumper
+                        showTotal={(total) => `Tổng ${total} bản ghi`}
+                        style={{ color: '#ffffff' }}
+                        
+                    />
+                </div>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>ID | NAME</th>
-                            <th>SERIAL NUMBER</th>
-                            <th>GENDER</th>
+                            <th>ID | TÊN</th>
+                            <th>MÃ SINH VIÊN</th>
+                            <th>GIỚI TÍNH</th>
                             <th>CARD UID</th>
-                            <th>DATE</th>
-                            <th>DEVICE</th>
-                            <th>ACTIONS</th>
+                            <th>NGÀY DANH</th>
+                            <th>THIẾT BỊ</th>
+                            <th>THAO TÁC</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -195,14 +213,14 @@ const UserList = () => {
                                             icon={<EditOutlined />}
                                             onClick={() => handleEdit(user)}
                                         >
-                                            Edit
+                                            SỬA
                                         </Button>
                                         <Button
                                             danger
                                             icon={<DeleteOutlined />}
                                             onClick={() => handleDelete(user.id)}
                                         >
-                                            Delete
+                                            XOÁ
                                         </Button>
                                     </Space>
                                 </td>
@@ -213,7 +231,7 @@ const UserList = () => {
             </main>
 
             <Modal
-                title={editingUser ? 'Edit User' : 'Add User'}
+                title={editingUser ? 'SỬA THÔNG TIN SINH VIÊN' : 'THÊM SINH VIÊN'}
                 open={isModalVisible}
                 onOk={handleModalSubmit}
                 onCancel={() => setIsModalVisible(false)}
@@ -224,25 +242,25 @@ const UserList = () => {
                 >
                     <Form.Item
                         name="username"
-                        label="Username"
-                        rules={[{ required: true, message: 'Please input username!' }]}
+                        label="Tên"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
                         name="serialnumber"
-                        label="Serial Number"
-                        rules={[{ required: true, message: 'Please input serial number!' }]}
+                        label="Mã sinh viên"
+                        rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
                         name="gender"
-                        label="Gender"
-                        rules={[{ required: true, message: 'Please select gender!' }]}
+                        label="Giới tính"
+                        rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
                     >
                         <Select
-                            placeholder="Select gender"
+                            placeholder="Chọn giới tính"
                         >
                             <Select.Option value="Male">Male</Select.Option>
                             <Select.Option value="Female">Female</Select.Option>
@@ -251,21 +269,22 @@ const UserList = () => {
                     <Form.Item
                         name="email"
                         label="Email"
-                        rules={[{ required: true, message: 'Please input email!' }]}
+                        rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
-                        name="device_dep"
-                        label="Device"
-                        rules={[{ required: true, message: 'Please input device!' }]}
+                        name="device_uid"
+                        label="Thiết bị"
+                        initialValue={editingUser ? editingUser.device_uid : null}
+                        rules={[{ required: true, message: 'Vui lòng chọn thiết bị!' }]}
                     >
                         <Select
-                            placeholder="Select device"
+                            placeholder="Chọn thiết bị"
                         >
-                            <Select.Option value="CTX">CTX</Select.Option>
-                            <Select.Option value="ATTZ">ATTZ</Select.Option>
-                            <Select.Option value="DTVTC">DTVTC</Select.Option>
+                            {departments.map(department => (
+                                <Select.Option value={department.device_uid}>{department.device_dep}</Select.Option>
+                            ))}
                         </Select>
                     </Form.Item>
                 </Form>

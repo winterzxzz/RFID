@@ -1,0 +1,4 @@
+enum TestShow {
+  test,
+  result,
+}

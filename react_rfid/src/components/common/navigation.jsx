@@ -10,31 +10,31 @@ function Navigation() {
 
     const handleLogout = () => {
         Modal.confirm({
-            title: 'Are you sure you want to log out?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes',
+            title: 'Bạn có chắc chắn muốn đăng xuất?',
+            content: 'Hành động này không thể hoàn tác.',
+            okText: 'Đăng xuất',
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: 'Hủy',
             onOk: async () => {
                 localStorage.removeItem('token');
                 navigate('/login');
             }
         });
     }
-
+    
     if(isLoggedIn) {
         return (
             <nav>
-                <button onClick={() => navigate('/users')}>Users</button>
-                <button onClick={() => navigate('/users-log')}>Users Log</button>
-                <button onClick={() => navigate('/devices')}>Devices</button>
-                <button onClick={handleLogout}>Log Out</button>
+                <button onClick={() => navigate('/users')}>DANH SÁCH SINH VIÊN</button>
+                <button onClick={() => navigate('/users-log')}>LỊCH SỬ ĐIỂM DANH</button>
+                <button onClick={() => navigate('/devices')}>THIẾT BỊ</button>
+                <button onClick={handleLogout}>ĐĂNG XUẤT</button>
             </nav>
         );
     } else {
         return (
             <nav>
-                <button onClick={() => navigate('/login')}>Log In</button>
+                <button onClick={() => navigate('/login')}>ĐĂNG NHẬP</button>
             </nav>
         );
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, DatePicker, Select } from 'antd';
+import { Button, DatePicker, Select, Pagination } from 'antd';
 import * as XLSX from 'xlsx';
 import apiClient from '../../configs/api_client';
 import { toast } from 'react-toastify';
@@ -13,6 +13,13 @@ const UserLogs = () => {
   const [departments, setDepartments] = useState([]);
   const [department, setDepartment] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const initPagination = {
+    total: 0,
+    totalPages: 0,
+    currentPage: 1,
+    limit: 20
+  };
+  const [pagination, setPagination] = useState(initPagination);
 
   // Filter and export function
   const handleExport = () => {
@@ -29,7 +36,7 @@ const UserLogs = () => {
 
   useEffect(() => {
     fetchUserLogs();
-  }, []);
+  }, [pagination.currentPage, pagination.limit]);
 
   useEffect(() => {
     // Initialize socket connection
@@ -38,7 +45,7 @@ const UserLogs = () => {
     // Listen for new logs
     newSocket.on('attendance', (newLog) => {
         toast.success(newLog.message);
-        fetchUserLogs();
+        handleFilter();
     });
 
     // Cleanup on component unmount
@@ -48,14 +55,25 @@ const UserLogs = () => {
   const fetchUserLogs = async () => {   
     setLoading(true);
     try {
-      const response = await apiClient.get('/users-log');
+      console.log(department, dateRange);
+      let query = `?page=${pagination.currentPage}&limit=${pagination.limit}`;
+      if(dateRange != null) {
+        query += `&date_start=${dateRange[0]}&date_end=${dateRange[1]}`;
+      }
+      if(department != null) {
+        query += `&device_dep=${department}`;
+      }
+      const response = await apiClient.get(`/users-log${query}`);
       const data = response.data;
       if(data['status_code'] == 200) {
-        setLogs([...data['data']]);
-        setFilteredLogs([...data['data']]);
-        // Get unique departments using Set
-        const uniqueDepartments = [...new Set(data['data'].map(log => log.device_dep))];
-        setDepartments(uniqueDepartments);
+        setLogs([...data['data']['items']]);
+        setFilteredLogs([...data['data']['items']]);
+        setPagination(data['data']['pagination']);
+        // Create a Set from the departments extracted from logs
+        if(departments.length == 0) {
+          const uniqueDepartments = [...new Set(data['data']['items'].map(log => log.device_dep))];
+          setDepartments(uniqueDepartments);
+        }
       } else {
         toast.error(data['message']);
       }
@@ -66,25 +84,30 @@ const UserLogs = () => {
     }
   };
 
-  const handleFilter = () => {
-    if(dateRange == null && department == null) {
-        setFilteredLogs(logs);
-    } else {
-        if(dateRange == null) {
-            setFilteredLogs(logs.filter(log => log.device_dep === department));
-        }
-        if(department == null) {
-            setFilteredLogs(logs.filter(log => {
-                const logDate = new Date(log.checkindate.split('T')[0]); 
-                return logDate >= new Date(dateRange[0]) && logDate <= new Date(dateRange[1]);
-            }));
-        }
-        if(dateRange != null && department != null) {
-            setFilteredLogs(logs.filter(log => {
-                const logDate = new Date(log.checkindate.split('T')[0]); 
-                return logDate >= new Date(dateRange[0]) && logDate <= new Date(dateRange[1]) && log.device_dep === department;
-            }));
-        }
+  const handleFilter = async () => {
+    setLoading(true);
+    try {
+      let query = `?page=1&limit=${pagination.limit}`;
+      if(dateRange != null) {
+        query += `&date_start=${dateRange[0]}&date_end=${dateRange[1]}`;
+      }
+      if(department != null) {
+        query += `&device_dep=${department}`;
+      }
+
+      const response = await apiClient.get(`/users-log${query}`);
+      const data = response.data;
+      if(data['status_code'] == 200) {
+        setLogs([...data['data']['items']]);
+        setFilteredLogs([...data['data']['items']]);
+        setPagination(data['data']['pagination']);
+      } else {
+        toast.error(data['message']);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,14 +133,14 @@ const UserLogs = () => {
     </div>;
 } else {
     if(logs.length === 0) {
-        return <div>No user logs found</div>;
+        return <div>Không có dữ liệu</div>;
     }
 }
 
   return (
     <div className="p-6">
       <h1 className="text-center text-3xl mb-6">
-        HERE ARE THE USERS DAILY LOGS
+        LỊCH SỬ ĐIỂM DANH
       </h1>
       
       {/* Add filter controls */}
@@ -126,32 +149,43 @@ const UserLogs = () => {
           onChange={(dates) => {
             setDateRange(dates);
           }}
+          value={dateRange}
+          allowClear
+          onClear={() => {
+            setDateRange(null);
+          }}
+          placeholder="Chọn ngày"
           style={{ width: '256px', margin: '8px' }}
         />
 
 
         <Select
-          placeholder="Select Department"
+          placeholder="Chọn phòng ban"
           onChange={(value) => {
             setDepartment(value);
           }}
+          value={department}
+          onClear={() => {
+            setDepartment(null);
+          }}
+          allowClear
           style={{ width: '192px' }}
           options={departments.map(dep => ({ value: dep, label: dep }))}
         />
         
         <Button 
           type="primary" 
-          onClick={handleFilter} 
+          onClick={() => handleFilter()} 
           style={{ backgroundColor: '#0d9488', margin: '8px' }}
         >
-          Filter
+          LỌC
         </Button>
         <Button 
           type="primary" 
           onClick={handleExport} 
           style={{ backgroundColor: '#0d9488' }}
         >
-          Export to Excel
+          XUẤT EXCEL
         </Button>
       </div>
 
@@ -163,25 +197,25 @@ const UserLogs = () => {
                 ID {sortConfig.key === 'id' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('username')}>
-                NAME {sortConfig.key === 'username' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                 TÊN SINH VIÊN {sortConfig.key === 'username' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('serialnumber')}>
-                SERIAL NUMBER {sortConfig.key === 'serialnumber' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                MÃ SINH VIÊN {sortConfig.key === 'serialnumber' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('card_uid')}>
                 CARD UID {sortConfig.key === 'card_uid' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('device_dep')}>
-                DEVICE DEP {sortConfig.key === 'device_dep' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                THIẾT BỊ PHÒNG {sortConfig.key === 'device_dep' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('checkindate')}>
-                DATE {sortConfig.key === 'checkindate' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                NGÀY {sortConfig.key === 'checkindate' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('timein')}>
-                TIME IN {sortConfig.key === 'timein' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                GIỜ VÀO {sortConfig.key === 'timein' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('timeout')}>
-                TIME OUT {sortConfig.key === 'timeout' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                GIỜ RA {sortConfig.key === 'timeout' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
               </th>
             </tr>
           </thead>
@@ -201,6 +235,26 @@ const UserLogs = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+        <Pagination
+          current={pagination.currentPage}
+          pageSize={pagination.limit}
+          total={pagination.total}
+          pageSizeOptions={['10', '20', '30', '40', '50']}
+          onChange={(page, size) => {
+            console.log(page, size);
+            setPagination({
+              ...pagination,
+              currentPage: page,
+              limit: size, 
+            });
+          }}
+          showSizeChanger
+          showQuickJumper
+          style={{ color: '#ffffff' }}
+        />
       </div>
     </div>
   );

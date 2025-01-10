@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Modal, Form, Input, Select } from 'antd';
+import { Table, Space, Button, Modal, Form, Input, Select, Pagination } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '../../configs/api_client';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 
 
 const DevicesPage = () => {
@@ -13,18 +12,25 @@ const DevicesPage = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingDevice, setEditingDevice] = useState(null);
     const [form] = Form.useForm();
+    const [pagination, setPagination] = useState({
+        total: 0,
+        totalPages: 0,
+        currentPage: 1,
+        limit: 10
+    });
 
     useEffect(() => {
-        fetchDevices();
-    }, []);
+        fetchDevices(pagination.currentPage, pagination.limit);
+    }, [pagination.currentPage, pagination.limit]);
 
-    const fetchDevices = async () => {
+    const fetchDevices = async (page, limit) => {
         setIsLoading(true);
         try {
-            const response = await apiClient.get('/devices');
+            const response = await apiClient.get(`/devices?page=${page}&limit=${limit}`);
             const data = response.data;
             if (data['status_code'] == 200) {
-                setDevices([...data['data']]);
+                setDevices([...data['data']['items']]);
+                setPagination(data['data']['pagination']);
             } else {
                 toast.error(data['message']);
             }
@@ -52,16 +58,21 @@ const DevicesPage = () => {
             const values = await form.validateFields();
             if (editingDevice) {
                 // Handle update
-                const response = await apiClient.put(`/devices/${editingDevice.id}`, values);
+                const response = await apiClient.put(`/devices/${editingDevice.id}`, {
+                    device_name: values.device_name,
+                    device_dep: values.device_dep,
+                    device_mode: editingDevice.device_mode,
+                });
                 if (response.data.status_code === 200) {
                     fetchDevices();
+                    toast.success('Cập nhật thiết bị thành công');
                 }
             } else {
                 // Handle create
                 const response = await apiClient.post('/devices', values);
                 if (response.data.status_code === 200) {
-                    toast.success('Device created successfully');
                     fetchDevices();
+                    toast.success('Thêm thiết bị thành công');
                 }
             }
             setIsModalVisible(false);
@@ -70,7 +81,7 @@ const DevicesPage = () => {
         }
     };
 
-    const handleUpdate = async (device) => {
+    const handleChangeMode = async (device) => {
         try {
             const response = await apiClient.put(`/devices/${device.id}`, device);
             if (response.data.status_code === 200) {
@@ -83,11 +94,11 @@ const DevicesPage = () => {
 
     const handleDelete = async (deviceId) => {
         Modal.confirm({
-            title: 'Are you sure you want to delete this device?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes',
+            title: 'Bạn có chắc chắn muốn xoá thiết bị này?',
+            content: 'Hành động này không thể hoàn tác.',
+            okText: 'Xoá',
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: 'Hủy',
             onOk: async () => {
                 try {
                     const response = await apiClient.delete(`/devices/${deviceId}`);
@@ -111,7 +122,7 @@ const DevicesPage = () => {
         </div>;
     } else {
         if (devices.length === 0) {
-            return <div>No devices found</div>;
+            return <div>Không có dữ liệu</div>;
         }
     }
 
@@ -119,24 +130,47 @@ const DevicesPage = () => {
         <div style={{ padding: '24px' }}>
             <main>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h2>Manage Devices</h2>
+
+                    <div>
+                    <h2>QUẢN LÝ THIẾT BỊ</h2>
+
                     <Button
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={handleAdd}
                     >
-                        Add Device
+                        THÊM THIẾT BỊ
                     </Button>
+
+                    </div>
+
+                    {/* pagination */}
+                    <Pagination
+                        current={pagination.currentPage}
+                        pageSize={pagination.limit}
+                        total={pagination.total}
+                        onChange={(page, size) => {
+                            setPagination({
+                                ...pagination,
+                                currentPage: page,
+                                limit: size
+                            });
+                        }}
+                        showSizeChanger
+                        showTotal={(total) => `Tổng ${total} bản ghi`}
+                        style={{ color: '#ffffff' }}
+                    />
+
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>De.Name</th>
-                            <th>De.Department</th>
-                            <th>De.UID</th>
-                            <th>De.Date</th>
-                            <th>De.Mode</th>
-                            <th>Actions</th>
+                            <th>TÊN THIẾT BỊ</th>
+                            <th>PHÒNG</th>
+                            <th>MÃ THIẾT BỊ</th>
+                            <th>NGÀY CẬP NHẬT</th>
+                            <th>TRẠNG THÁI</th>
+                            <th>HÀNH ĐỘNG</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -149,17 +183,17 @@ const DevicesPage = () => {
                                 {/* toggle device mode */}
                                 <td style={{ display: 'flex', justifyContent: 'start', gap: '10px' }}>
                                     <Button
-                                        onClick={() => handleUpdate({ ...device, device_mode: device.device_mode === 0 ? 1 : 0 })}
+                                        onClick={() => handleChangeMode({ ...device, device_mode: device.device_mode === 0 ? 1 : 0 })}
                                         type={device.device_mode === 0 ? 'primary' : 'default'}
                                     >
-                                        Enrollment
+                                        ĐĂNG KÝ
                                     </Button>
 
                                     <Button
-                                        onClick={() => handleUpdate({ ...device, device_mode: device.device_mode === 1 ? 0 : 1 })}
+                                        onClick={() => handleChangeMode({ ...device, device_mode: device.device_mode === 1 ? 0 : 1 })}
                                         type={device.device_mode === 1 ? 'primary' : 'default'}
                                     >
-                                        Attendance
+                                        ĐIỂM DANH
                                     </Button>
                                 </td>
                                 <td>
@@ -169,14 +203,14 @@ const DevicesPage = () => {
                                             icon={<EditOutlined />}
                                             onClick={() => handleEdit(device)}
                                         >
-                                            Edit
+                                            SỬA
                                         </Button>
                                         <Button
                                             danger
                                             icon={<DeleteOutlined />}
                                             onClick={() => handleDelete(device.id)}
                                         >
-                                            Delete
+                                            XOÁ
                                         </Button>
                                     </Space>
                                 </td>
@@ -187,7 +221,7 @@ const DevicesPage = () => {
             </main>
 
             <Modal
-                title={editingDevice ? 'Edit Device' : 'Add Device'}
+                title={editingDevice ? 'SỬA THIẾT BỊ' : 'THÊM THIẾT BỊ'}
                 open={isModalVisible}
                 onOk={handleModalSubmit}
                 onCancel={() => setIsModalVisible(false)}
@@ -198,23 +232,17 @@ const DevicesPage = () => {
                 >
                     <Form.Item
                         name="device_name"
-                        label="Name"
-                        rules={[{ required: true, message: 'Please input name!', }]}
+                        label="TÊN THIẾT BỊ"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên thiết bị!', }]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
                         name="device_dep"
-                        label="Department"
-                        rules={[{ required: true, message: 'Please input department!' }]}
+                        label="PHÒNG"
+                        rules={[{ required: true, message: 'Vui lòng nhập phòng!' }]}
                     >
-                        <Select
-                            placeholder="Select department"
-                        >
-                            <Select.Option value="CTX">CTX</Select.Option>
-                            <Select.Option value="ATTZ">ATTZ</Select.Option>
-                            <Select.Option value="DTVTC">DTVTC</Select.Option>
-                        </Select>
+                        <Input />
                     </Form.Item>
                 </Form>
             </Modal>

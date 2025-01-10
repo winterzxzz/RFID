@@ -1,0 +1,310 @@
+
+[
+    {
+        "id": 1,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fbo_toc_cung_gia.png?alt=media&token=0c3e8210-a67b-4245-aa72-b6b23cb5aa67",
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/part%201.mp3?alt=media&token=95407c9b-5fbd-46a7-a4c3-831d52e1e2d7",
+        "option1": "A clerk at the counter is helping the customers",
+        "option2": "People are waiting in line for their turn",
+        "option3": "One of the men is paying for his food",
+        "option4": "People are standing in front of the hotel",
+        "correctAnswer": "B",
+        "part": 1,
+        "categories": ["detail"]
+    },
+    {
+        "id": 2,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fbo_toc_cung_gia.png?alt=media&token=0c3e8210-a67b-4245-aa72-b6b23cb5aa67",
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "option1": "A patron is seated at a table outside",
+        "option2": "The chairs have been placed on the table",
+        "option3": "The tables have been set for a meal",
+        "option4": "The chairs are arranged around the tables",
+        "correctAnswer": "D",
+        "part": 1,
+        "categories": ["detail", "inference"]
+    },
+    {
+        "id": 3,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fdo-toc-21.png?alt=media&token=fa5b11c3-9fd7-4157-87ff-5c54712993ca",
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4.mp3?alt=media&token=f9b80abc-d3f0-43c5-8996-ebd4cdbde782",
+        "option1": "He is leaning against a tree",
+        "option2": "He is sitting in a restaurant",
+        "option3": "He is mowing the grass",
+        "option4": "He is watering the lawn",
+        "correctAnswer": "A",
+        "part": 1,
+        "categories": ["inference"]
+    },
+    {
+        "id": 4,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fdo-toc-21.png?alt=media&token=fa5b11c3-9fd7-4157-87ff-5c54712993ca",
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "option1": "A clerk at the counter is helping the customers",
+        "option2": "People are waiting in line for their turn",
+        "option3": "One of the men is paying for his food",
+        "option4": "People are standing in front of the hotel",
+        "correctAnswer": "B",
+        "part": 1,
+        "categories": ["detail"]
+    },
+    {
+        "id": 5,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fdo-toc-21.png?alt=media&token=fa5b11c3-9fd7-4157-87ff-5c54712993ca",
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4.mp3?alt=media&token=f9b80abc-d3f0-43c5-8996-ebd4cdbde782",
+        "option1": "A patron is seated at a table outside",
+        "option2": "The chairs have been placed on the table",
+        "option3": "The tables have been set for a meal",
+        "option4": "The chairs are arranged around the tables",
+        "correctAnswer": "D",
+        "part": 1,
+        "categories": ["detail", "inference"]
+    },
+    {
+        "id": 6,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fdo-toc-21.png?alt=media&token=fa5b11c3-9fd7-4157-87ff-5c54712993ca",
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "option1": "He is leaning against a tree",
+        "option2": "He is sitting in a restaurant",
+        "option3": "He is mowing the grass",
+        "option4": "He is watering the lawn",
+        "correctAnswer": "A",
+        "part": 1,
+        "categories": ["inference"]
+    },
+
+    
+    {
+        "id": 7,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "option1": "You want to adopt a new inventory control system, don’t you?",
+        "option2": "Most of us do",
+        "option3": "I usually use this system",
+        "correctAnswer": "A",
+        "part": 2,
+        "categories": ["vocabulary"]
+    },
+    {
+        "id": 8,
+        "audio": "nhttps://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4um5",
+        "option1": "Aren’t you delivering an opening speech next week?",
+        "option2": "Yes, but I feel pretty well prepared for it",
+        "option3": "Yes, he was very surprised with the party",
+        "correctAnswer": "A",
+        "part": 2,
+        "categories": ["vocabulary"]
+    },
+    {
+        "id": 9,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "option1": "What’s the timeline for the bid?",
+        "option2": "I’ve been busy for the past few weeks",
+        "option3": "It hasn’t been discussed yet",
+        "correctAnswer": "C",
+        "part": 2,
+        "categories": ["vocabulary"]
+    },
+    {
+        "id": 10,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "correctAnswer": "C",
+        "part": 2,
+        "categories": ["vocabulary"]
+    },
+
+    {
+        "id": 11,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "question": "When is the best time to meet you?",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 3,
+        "categories": ["vocabulary"]
+    },
+
+
+    {
+        "id": 12,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "question": "When is the best time to meet you?",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 3,
+        "categories": ["vocabulary"]
+    },
+
+
+    {
+        "id": 13,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "question": "When is the best time to meet you?",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 4,
+        "categories": ["vocabulary"]
+    },
+
+    {
+        "id": 14,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "question": "When is the best time to meet you?",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 4,
+        "categories": ["vocabulary"]
+    },
+
+
+    {
+        "id": 15,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "question": "When is the best time to meet you?",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 4,
+        "categories": ["vocabulary"]
+    },
+
+    {
+        "id": 16,
+        "audio": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/4a.mp3?alt=media&token=fd4d6544-a983-4625-bf9c-edf5cbe550b4",
+        "question": "When is the best time to meet you?",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 4,
+        "categories": ["vocabulary"]
+    },
+
+    {
+        "id": 17,
+        "question": "When filling out the order form, please _____ your address clearly to prevent delays.",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 5,
+        "categories": ["vocabulary"]
+    },
+
+    {
+        "id": 18,
+        "question": "When filling out the order form, please _____ your address clearly to prevent delays.",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 5,
+        "categories": ["vocabulary"]
+    },
+
+
+    {
+        "id": 19,
+        "question": "When filling out the order form, please _____ your address clearly to prevent delays.",
+        "option1": "When is the best time to meet you?",
+        "option2": "No, this is my first time",
+        "option3": "Have a good time",
+        "option4": "Between 10 and 11 a.m",
+        "correctAnswer": "C",
+        "part": 5,
+        "categories": ["vocabulary"]
+    },
+
+
+    {
+        "id": 65,
+        "paragraph": "Security Inc. is the most trusted name in the sales and service of financial equipment and automated teller machines. Offering a degree of personal yet professional service that is unrivaled in the financial industry today, all employees at Security Inc. are (65)........\r\n\r\nproduct lines or tailor a financial equipment service program to (66)........ your specific business needs.\r\n\r\nWe offer the widest array of financial equipment products, services and supplies. This diversity in product and service offerings, combined with our unrivaled knowledge in the sale and service of automated teller machines, provides a (67)........ edge and real value for our customers.",
+        "question": "Choose the word or phrase that best completes the blanks:",
+        "option1": "for our customers.",
+        "option2": "using",
+        "option3": "instructed",
+        "option4": "dependent",
+        "correctAnswer": "A",
+        "part": 6,
+        "categories": ["text_completion", "vocabulary", "grammar"]
+    },
+
+    {
+        "id": 66,
+        "paragraph": "Security Inc. is the most trusted name in the sales and service of financial equipment and automated teller machines. Offering a degree of personal yet professional service that is unrivaled in the financial industry today, all employees at Security Inc. are (65)........\r\n\r\nproduct lines or tailor a financial equipment service program to (66)........ your specific business needs.\r\n\r\nWe offer the widest array of financial equipment products, services and supplies. This diversity in product and service offerings, combined with our unrivaled knowledge in the sale and service of automated teller machines, provides a (67)........ edge and real value for our customers.",
+        "question": "Choose the word or phrase that best completes the blanks:",
+        "option1": "for our customers.",
+        "option2": "using",
+        "option3": "instructed",
+        "option4": "dependent",
+        "correctAnswer": "A",
+        "part": 6,
+        "categories": ["text_completion", "vocabulary", "grammar"]
+    },
+
+    {
+        "id": 67,
+        "paragraph": "Security Inc. is the most trusted name in the sales and service of financial equipment and automated teller machines. Offering a degree of personal yet professional service that is unrivaled in the financial industry today, all employees at Security Inc. are (65)........\r\n\r\nproduct lines or tailor a financial equipment service program to (66)........ your specific business needs.\r\n\r\nWe offer the widest array of financial equipment products, services and supplies. This diversity in product and service offerings, combined with our unrivaled knowledge in the sale and service of automated teller machines, provides a (67)........ edge and real value for our customers.",
+        "question": "Choose the word or phrase that best completes the blanks:",
+        "option1": "for our customers.",
+        "option2": "using",
+        "option3": "instructed",
+        "option4": "dependent",
+        "correctAnswer": "A",
+        "part": 6,
+        "categories": ["text_completion", "vocabulary", "grammar"]
+    },
+    {
+        "id": 74,
+        "image": "https://firebasestorage.googleapis.com/v0/b/winter-spotify.appspot.com/o/covers%2Fbo_toc_cung_gia.png?alt=media&token=0c3e8210-a67b-4245-aa72-b6b23cb5aa67",
+        "paragraph": "Dear Readers,\r\n\r\nThis July, Horse and Rider will celebrate its 27th anniversary. Since its first issue was published in January of 1980, Horse and Rider has continued to bring its readers tasteful but entertaining articles covering everything about horses. To celebrate our anniversary, we are offering a special promotion to all our readers: a free three-month subscription. Plus, you will receive our special anniversary issue,\r\nwhich will be published at the end of July. This special issue will feature an article about Marjorie Clemmons, the Senior Editor and founder of Horse and Rider.\r\n\r\n\r\nTo be eligible for the special offer, just fill out the request form that is enclosed with this letter, and mail it to us by June 15th. As always, we welcome your questions and comments, so if you would like to be included in our From the Readers section, please visit our website www.horseandrider.com and submit\r\n\r\n\r\nyour review electronically. We thank you for your continued support, which has helped us become the most popular horse magazine in the country.\r\n\r\n\r\nSincerely,\r\nKatherine Fields\r\nPublic Relations Advisor",
+        "question": "Why did Katherine Fields write this letter?",
+        "option1": "To introduce a special offer",
+        "option2": "To ask customers about their subscription preference",
+        "option3": "To invite clients to the ceremony",
+        "option4": "To remind readers to renew their subscription",
+        "correctAnswer": "A",
+        "part": 7,
+        "categories": ["text_completion"]
+    },
+    {
+        "id": 100,
+        "question": "According to the article, what mistakes did the CEO of Telcorp make?",
+        "option1": "He introduced less attractive products.",
+        "option2": "He used company funds inappropriately.",
+        "option3": "He fired an employee without a reason.",
+        "option4": "He refused to invest in new technology.",
+        "correctAnswer": "B",
+        "part": 7,
+        "categories": ["tone_and_purpose"]
+    }, 
+    {
+        "id": 101,
+        "question": "According to the article, what mistakes did the CEO of Telcorp make?",
+        "option1": "He introduced less attractive products.",
+        "option2": "He used company funds inappropriately.",
+        "option3": "He fired an employee without a reason.",
+        "option4": "He refused to invest in new technology.",
+        "correctAnswer": "B",
+        "part": 7,
+        "categories": ["tone_and_purpose"]
+    }
+]

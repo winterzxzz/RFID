@@ -78,7 +78,7 @@ const verifyToken = (req, res, next) => {
     if (!token) {
         return res.status(403).json({
             status_code: 403,
-            message: 'A token is required for authentication',
+            message: 'Yêu cầu token để xác thực',
         });
     }
 
@@ -89,7 +89,7 @@ const verifyToken = (req, res, next) => {
     } catch (err) {
         return res.status(401).json({
             status_code: 401,
-            message: 'Invalid Token',
+            message: 'Token không hợp lệ',
         });
     }
 };
@@ -107,14 +107,14 @@ app.post('/login', (req, res) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error logging in',
+                message: 'Lỗi đăng nhập',
             });
         }
 
         if (result.length === 0) {
             return res.status(401).json({
                 status_code: 401,
-                message: 'User not found',
+                message: 'Tài khoản không tồn tại',
             });
         }
 
@@ -125,7 +125,7 @@ app.post('/login', (req, res) => {
         if (!isMatch) {
             return res.status(401).json({
                 status_code: 401,
-                message: 'Wrong password',
+                message: 'Mật khẩu không đúng',
             });
         }
         const token = jwt.sign(
@@ -136,11 +136,26 @@ app.post('/login', (req, res) => {
 
         res.status(200).json({
             status_code: 200,
-            message: 'Login successful',
+            message: 'Đăng nhập thành công',
             token: token,
             data: {
-                id: admin.id,
+                name: admin.admin_name,
                 email: admin.admin_email,
+            }
+        });
+    });
+});
+
+// get user info
+app.get('/user-info', verifyToken, (req, res) => {
+    const query = 'SELECT * FROM admin WHERE admin_email = ?';
+    db.query(query, [req.admin.email], (err, result) => {
+        res.status(200).json({
+            status_code: 200,
+            message: 'Lấy thông tin người dùng thành công',
+            data: {
+                name: result[0].admin_name,
+                email: result[0].admin_email,
             }
         });
     });
@@ -154,30 +169,77 @@ app.post('/change-password', verifyToken, (req, res) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error changing password',
+                message: 'Lỗi thay đổi mật khẩu',
             });
         }
         res.status(200).json({
             status_code: 200,
-            message: 'Password changed successfully',
+            message: 'Thay đổi mật khẩu thành công',
         });
     });
 });
 
 // get all users
 app.get('/users', verifyToken, (req, res) => {
-    const query = 'SELECT * FROM users ORDER BY id DESC';
-    db.query(query, (err, result) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const username = req.query.q || '';
+    const direction = req.query.direction === 'asc' ? 'ASC' : 'DESC';
+
+    const whereClause = username ? 'WHERE username LIKE ?' : '';
+    const searchParam = username ? `%${username}%` : null;
+
+    const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
+    db.query(countQuery, searchParam ? [searchParam] : [], (err, countResult) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error getting users',
+                message: 'Lỗi lấy danh sách người dùng',
             });
         }
-        res.status(200).json({
-            status_code: 200,
-            message: 'Users fetched successfully',
-            data: result,
+
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        const query = `SELECT * FROM users ${whereClause} ORDER BY id ${direction} LIMIT ? OFFSET ?`;
+        const queryParams = searchParam ? [searchParam, limit, offset] : [limit, offset];
+        
+        db.query(query, queryParams, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    status_code: 500,
+                    message: 'Lỗi lấy danh sách người dùng',
+                });
+            }
+
+            // get all departments (id, device_uid device_dep) and make it dis
+            const departmentsQuery = 'SELECT id, device_uid, device_dep FROM devices';
+            db.query(departmentsQuery, (err, departmentsResult) => {
+                if (err) {
+                    return res.status(500).json({
+                        status_code: 500,
+                        message: 'Lỗi lấy danh sách phòng ban',
+                    });
+                }
+
+                res.status(200).json({
+                    status_code: 200,
+                    message: 'Lấy danh sách người dùng thành công',
+                    data: {
+                        pagination: {
+                            total,
+                            totalPages,
+                            currentPage: page,
+                            limit
+                        },
+                        items: result,
+                        departments: departmentsResult,
+                    },
+                });
+            });
+
+            
         });
     });
 });
@@ -186,29 +248,44 @@ app.get('/users', verifyToken, (req, res) => {
 // update user
 app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
-    const { username, serialnumber, gender, email,  device_dep } = req.body;
-    const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, device_dep = ?, add_card = ? WHERE id = ?';
+    const { username, serialnumber, gender, email, device_uid } = req.body;
 
-    db.query(query, [username, serialnumber, gender, email, device_dep, 1, userId], (err, result) => {
+    db.query('SELECT * FROM devices WHERE device_uid = ?', [device_uid], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                status_code: 500,
+                message: 'Lỗi lấy thông tin thiết bị',
+                error: err.message
+            });
+        }
+
+        const { device_dep } = result[0];
+
+        const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, device_dep = ?, device_uid = ?, add_card = ? WHERE id = ?';
+
+
+        db.query(query, [username, serialnumber, gender, email, device_dep, device_uid, 1, userId], (err, result) => {
         if (err) {
             console.log(err);
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error updating user',
+                message: 'Lỗi cập nhật người dùng',
                 error: err.message
             });
         }
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 status_code: 404,
-                message: 'User not found'
+                message: 'Người dùng không tồn tại'
             });
         }
         res.status(200).json({
             status_code: 200,
-            message: 'User updated successfully'
+            message: 'Cập nhật người dùng thành công'
         });
     });
+    });
+
     
 });
 
@@ -221,19 +298,19 @@ app.delete('/users/:id', verifyToken, (req, res) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error deleting user',
+                message: 'Lỗi xoá người dùng',
                 error: err.message
             });
         }
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 status_code: 404,
-                message: 'User not found'
+                message: 'Người dùng không tồn tại'
             });
         }
         res.status(200).json({
             status_code: 200,
-            message: 'User deleted successfully'
+            message: 'Xoá người dùng thành công'
         });
     });
 });
@@ -242,18 +319,53 @@ app.delete('/users/:id', verifyToken, (req, res) => {
 
 // get all devices
 app.get('/devices', verifyToken, (req, res) => {
-    const query = 'SELECT * FROM devices';
-    db.query(query, (err, result) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const device_name = req.query.q || '';
+    const direction = req.query.direction === 'asc' ? 'ASC' : 'DESC';
+
+    // Add WHERE clause for device_name search
+    const whereClause = device_name ? 'WHERE device_name LIKE ?' : '';
+    const searchParam = device_name ? `%${device_name}%` : null;
+
+    // First, get total count with search
+    const countQuery = `SELECT COUNT(*) as total FROM devices ${whereClause}`;
+    db.query(countQuery, searchParam ? [searchParam] : [], (err, countResult) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error getting devices',
+                message: 'Lỗi lấy danh sách thiết bị',
             });
         }
-        res.status(200).json({
-            status_code: 200,
-            message: 'Devices fetched successfully',
-            data: result,
+
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        // Then get paginated data with search and sorting
+        const query = `SELECT * FROM devices ${whereClause} ORDER BY id ${direction} LIMIT ? OFFSET ?`;
+        const queryParams = searchParam ? [searchParam, limit, offset] : [limit, offset];
+        
+        db.query(query, queryParams, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    status_code: 500,
+                    message: 'Lỗi lấy danh sách thiết bị',
+                });
+            }
+            res.status(200).json({
+                status_code: 200,
+                message: 'Lấy danh sách thiết bị thành công',
+                data: {
+                    pagination: {
+                        total,
+                        totalPages,
+                        currentPage: page,
+                        limit
+                    }, 
+                    items: result
+                },
+            });
         });
     });
 });
@@ -262,25 +374,33 @@ app.get('/devices', verifyToken, (req, res) => {
 // add new device
 app.post('/devices', verifyToken, (req, res) => {
     const { device_name, device_dep } = req.body;
-    const query = 'INSERT INTO devices (device_name, device_dep, device_uid, device_date) VALUES (?, ?, ?, CURDATE())';
-
-    // 8f19e31055c56b05 random uid
     const device_uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    // 2021-06-21
-    const device_date = new Date().toISOString().split('T')[0];
+    const query = 'INSERT INTO devices (device_name, device_dep, device_uid, device_date) VALUES (?, ?, ?, CURDATE())';
     
-    db.query(query, [device_name, device_dep, device_uid, device_date], (err, result) => {
+    db.query(query, [device_name, device_dep, device_uid], (err, result) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error adding device',
+                message: 'Lỗi thêm thiết bị',
                 error: err.message
             });
         }
-        res.status(201).json({
-            status_code: 201,
-            message: 'Device added successfully',
-            data: { id: result.insertId }
+
+        // Fetch the newly created device
+        db.query('SELECT * FROM devices WHERE id = ?', [result.insertId], (err, devices) => {
+            if (err) {
+                return res.status(500).json({
+                    status_code: 500,
+                    message: 'Lỗi lấy thông tin thiết bị',
+                    error: err.message
+                });
+            }
+
+            res.status(200).json({
+                status_code: 200,
+                message: 'Thêm thiết bị thành công',
+                data: devices[0]
+            });
         });
     });
 });
@@ -288,27 +408,28 @@ app.post('/devices', verifyToken, (req, res) => {
 // update device
 app.put('/devices/:id', verifyToken, (req, res) => {
     const deviceId = req.params.id;
-    const { device_name, device_dep, device_uid, device_mode } = req.body;
+    const { device_name, device_dep, device_mode } = req.body;
     console.log(req.body);
-    const query = 'UPDATE devices SET device_name = ?, device_dep = ?, device_uid = ?, device_mode = ? WHERE id = ?';
+    const query = 'UPDATE devices SET device_name = ?, device_dep = ?, device_mode = ? WHERE id = ?';
     
-    db.query(query, [device_name, device_dep, device_uid, device_mode, deviceId], (err, result) => {
+    db.query(query, [device_name, device_dep, device_mode, deviceId], (err, result) => {
         if (err) {
+            console.log(err);
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error updating device',
+                message: 'Lỗi cập nhật thiết bị',
                 error: err.message
             });
         }
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 status_code: 404,
-                message: 'Device not found'
+                message: 'Thiết bị không tồn tại'
             });
         }
         res.status(200).json({
             status_code: 200,
-            message: 'Device updated successfully'
+            message: 'Cập nhật thiết bị thành công'
         });
     });
 });
@@ -322,19 +443,19 @@ app.delete('/devices/:id', verifyToken, (req, res) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error deleting device',
+                message: 'Lỗi xoá thiết bị',
                 error: err.message
             });
         }
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 status_code: 404,
-                message: 'Device not found'
+                message: 'Thiết bị không tồn tại'
             });
         }
         res.status(200).json({
             status_code: 200,
-            message: 'Device deleted successfully'
+            message: 'Xoá thiết bị thành công'
         });
     });
 });
@@ -342,19 +463,64 @@ app.delete('/devices/:id', verifyToken, (req, res) => {
 
 // get all users log
 app.get('/users-log', verifyToken, (req, res) => {
-    // sort by date desc if the same date, sort by timeout desc
-    const query = 'SELECT * FROM users_logs ORDER BY id DESC';
-    db.query(query, (err, result) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const direction = req.query.direction === 'asc' ? 'ASC' : 'DESC';
+
+    const date_start = req.query.date_start ? moment(req.query.date_start).format('YYYY-MM-DD') : '';
+    const date_end = req.query.date_end ? moment(req.query.date_end).format('YYYY-MM-DD') : '';
+    const device_dep = req.query.device_dep || '';
+
+    let whereClause = '1=1'; // Base condition that's always true
+    let queryParams = [];
+
+    // Only add date conditions if dates are provided
+    if (date_start && date_end) {
+        whereClause += ' AND DATE(checkindate) BETWEEN ? AND ?';
+        queryParams.push(date_start, date_end);
+    }
+
+    if (device_dep) {
+        whereClause += ' AND device_dep = ?';
+        queryParams.push(device_dep);
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM users_logs WHERE ${whereClause}`;
+    db.query(countQuery, queryParams, (err, countResult) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Error getting users log',
+                message: 'Lỗi lấy lịch sử điểm danh',
             });
         }
-        res.status(200).json({
-            status_code: 200,
-            message: 'Users log fetched successfully',
-            data: result,
+
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        const query = `SELECT * FROM users_logs WHERE ${whereClause} ORDER BY id ${direction} LIMIT ? OFFSET ?`;
+        queryParams.push(limit, offset);
+        
+        db.query(query, queryParams, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    status_code: 500,
+                    message: 'Lỗi lấy lịch sử điểm danh',
+                });
+            }
+            res.status(200).json({
+                status_code: 200,
+                message: 'Lấy lịch sử điểm danh thành công',
+                data: {
+                    pagination: {
+                        total,
+                        totalPages,
+                        currentPage: page,
+                        limit
+                    },
+                    items: result
+                },
+            });
         });
     });
 });
@@ -366,7 +532,7 @@ app.post('/users-log', async (req, res) => {
     if (!card_uid || !device_uid) {
         return res.status(400).json({
             status_code: 400,
-            message: 'Missing parameters',
+            message: 'Thiếu tham số',
         });
     }
 
@@ -378,7 +544,7 @@ app.post('/users-log', async (req, res) => {
         if (!device) {
             return res.status(400).json({
                 status_code: 400,
-                message: 'Unauthorized!',
+                message: 'Không được phép!',
             });
         }
 
@@ -393,21 +559,21 @@ app.post('/users-log', async (req, res) => {
             if (!user) {
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Not found!',
+                    message: 'Không tồn tại!',
                 });
             }
 
             if (user.add_card !== 1) {
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Not registerd!',
+                    message: 'Không được đăng ký!',
                 });
             }
 
             if (user.device_uid !== device_uid && user.device_uid !== 0) {
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Not Allowed!',
+                    message: 'Không được phép!',
                 });
             }
 
@@ -430,11 +596,11 @@ app.post('/users-log', async (req, res) => {
                 );
                 io.emit('attendance', {
                     status_code: 200,
-                    message: 'Check in ' + user.username,
+                    message: 'CHECK IN ' + user.username,
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'Check in ' + user.username,
+                    message: 'CHECK IN ' + user.username,
                 });
             } else {
                 // Complete the existing check-in with a timeout
@@ -444,11 +610,11 @@ app.post('/users-log', async (req, res) => {
                 );
                 io.emit('attendance', {
                     status_code: 200,
-                    message: 'Check out ' + user.username,
+                    message: 'CHECK OUT ' + user.username,
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'Check out ' + user.username,
+                    message: 'CHECK OUT ' + user.username,
                 });
             }
         }
@@ -462,11 +628,11 @@ app.post('/users-log', async (req, res) => {
                 await db.promise().query('UPDATE users SET card_select = 1 WHERE card_uid = ?', [card_uid]);
                 io.emit('add-card', {
                     status_code: 400,
-                    message: 'Card ' + card_uid + ' is available',
+                    message: 'Card ' + card_uid + ' đã được đăng ký',
                 });
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Card ' + card_uid + ' is available',
+                    message: 'Card ' + card_uid + ' đã được đăng ký',
                 });
             } else {
                 await db.promise().query('UPDATE users SET card_select = 0');
@@ -484,12 +650,12 @@ app.post('/users-log', async (req, res) => {
                 console.log(newUser);
                 io.emit('add-card', {
                     status_code: 200,
-                    message: 'Add Card ' + card_uid,
+                    message: 'Đăng ký thẻ ' + card_uid + ' thành công',
                     data: newUser
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'Add Card ' + card_uid,
+                    message: 'Đăng ký thẻ ' + card_uid + ' thành công',
                     data: newUser
                 });
             }

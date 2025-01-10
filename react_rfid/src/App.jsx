@@ -15,8 +15,8 @@ function App() {
   return (
     <BrowserRouter>
       <div className="container">
-        <header>
-          <h1>RFID Attendance</h1>
+        <header className="flex justify-between items-center p-4">
+          <h1 className="text-2xl font-bold">ĐIỂM DANH SINH VIÊN</h1>
           <Navigation />
         </header>
 
