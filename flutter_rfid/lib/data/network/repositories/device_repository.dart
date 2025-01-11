@@ -45,7 +45,7 @@ class DeviceRepositoryImpl extends DeviceRepository {
   Future<Either<ApiError, List<DeviceEntity>>> getDevices() async {
     try {
       final response = await apiClient.getDevices();
-      return Right(response.data);
+      return Right(response.data ?? []);
     } on DioException catch (e) {
       return Left(ApiError.fromJson(e.response?.data));
     }

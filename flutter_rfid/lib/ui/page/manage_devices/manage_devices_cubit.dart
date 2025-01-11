@@ -12,7 +12,7 @@ class ManageDevicesCubit extends Cubit<ManageDevicesState> {
 
   // get all devices
   Future<void> getDevices() async {
-    final response = await deviceRepository.();
-    response.fold((l) => emit(state.copyWith(error: l.message)), (r) => emit(state.copyWith(devices: r)));
+    // final response = await deviceRepository.();
+    // response.fold((l) => emit(state.copyWith(error: l.message)), (r) => emit(state.copyWith(devices: r)));
   }
 }

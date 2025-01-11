@@ -254,8 +254,7 @@ app.put('/users/:id', (req, res) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
-                message: 'Lỗi lấy thông tin thiết bị',
-                error: err.message
+                message: err.message
             });
         }
 
@@ -269,8 +268,7 @@ app.put('/users/:id', (req, res) => {
             console.log(err);
             return res.status(500).json({
                 status_code: 500,
-                message: 'Lỗi cập nhật người dùng',
-                error: err.message
+                message: err.message,
             });
         }
         if (result.affectedRows === 0) {
@@ -525,6 +523,14 @@ app.get('/users-log', verifyToken, (req, res) => {
     });
 });
 
+function convertVietnameseNameToEnglish(vietnameseName) {
+    return vietnameseName
+        .normalize('NFD') // Normalize to separate diacritics from characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks
+        .replace(/đ/g, 'd') // Replace lowercase đ
+        .replace(/Đ/g, 'D'); // Replace uppercase Đ
+}
+
 // add user log
 app.post('/users-log', async (req, res) => {
     const { card_uid, device_uid } = req.query;
@@ -532,7 +538,7 @@ app.post('/users-log', async (req, res) => {
     if (!card_uid || !device_uid) {
         return res.status(400).json({
             status_code: 400,
-            message: 'Thiếu tham số',
+            message: 'Missing parameters',
         });
     }
 
@@ -544,7 +550,7 @@ app.post('/users-log', async (req, res) => {
         if (!device) {
             return res.status(400).json({
                 status_code: 400,
-                message: 'Không được phép!',
+                message: 'Not allowed!',
             });
         }
 
@@ -559,21 +565,21 @@ app.post('/users-log', async (req, res) => {
             if (!user) {
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Không tồn tại!',
+                    message: 'Not found!',
                 });
             }
 
             if (user.add_card !== 1) {
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Không được đăng ký!',
+                    message: 'Not Registered!',
                 });
             }
 
             if (user.device_uid !== device_uid && user.device_uid !== 0) {
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Không được phép!',
+                    message: 'Not allowed!',
                 });
             }
 
@@ -600,7 +606,7 @@ app.post('/users-log', async (req, res) => {
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'CHECK IN ' + user.username,
+                    message: 'CHECK IN ' + convertVietnameseNameToEnglish(user.username),
                 });
             } else {
                 // Complete the existing check-in with a timeout
@@ -614,7 +620,8 @@ app.post('/users-log', async (req, res) => {
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'CHECK OUT ' + user.username,
+                    // convert user.name to from vietnamese to english
+                    message: 'CHECK OUT ' + convertVietnameseNameToEnglish(user.username),
                 });
             }
         }
@@ -628,11 +635,11 @@ app.post('/users-log', async (req, res) => {
                 await db.promise().query('UPDATE users SET card_select = 1 WHERE card_uid = ?', [card_uid]);
                 io.emit('add-card', {
                     status_code: 400,
-                    message: 'Card ' + card_uid + ' đã được đăng ký',
+                    message: 'Card ' + card_uid + ' already registered',
                 });
                 return res.status(400).json({
                     status_code: 400,
-                    message: 'Card ' + card_uid + ' đã được đăng ký',
+                    message: 'Card ' + card_uid + ' already registered',
                 });
             } else {
                 await db.promise().query('UPDATE users SET card_select = 0');
@@ -650,12 +657,12 @@ app.post('/users-log', async (req, res) => {
                 console.log(newUser);
                 io.emit('add-card', {
                     status_code: 200,
-                    message: 'Đăng ký thẻ ' + card_uid + ' thành công',
+                    message: 'Register card ' + card_uid + ' success',
                     data: newUser
                 });
                 return res.status(200).json({
                     status_code: 200,
-                    message: 'Đăng ký thẻ ' + card_uid + ' thành công',
+                    message: 'Register card ' + card_uid + ' success',
                     data: newUser
                 });
             }
