@@ -30,42 +30,71 @@ class Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GeneralCubit, GeneralState>(
-      builder: (context, state) {
-        return Scaffold(
-          bottomNavigationBar: BottomNavigationBar(
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: AppColors.gray3,
-            selectedLabelStyle: const TextStyle(fontSize: 12),
-            unselectedLabelStyle: const TextStyle(fontSize: 12),
-            showUnselectedLabels: true,
-            iconSize: 20,
-            currentIndex: state.currentIndex,
-            onTap: (index) =>
-                context.read<GeneralCubit>().changeCurrentIndex(index),
-            items: Constants.homeItems
-                .map((item) => BottomNavigationBarItem(
-                    icon: FaIcon(item.icon), label: item.title))
-                .toList(),
-          ),
-          body: PageView(
-            controller: context.read<GeneralCubit>().pageController,
-            onPageChanged: (index) =>
-                context.read<GeneralCubit>().changeCurrentIndex(index),
-            children: const [
-              KeepAlivePage(child: ManageUsersPage()),
-              KeepAlivePage(child: UserLogsPage()),
-              KeepAlivePage(child: ManageDevicesPage()),
-              KeepAlivePage(child: ProfilePage()),
-            ],
-          ),
-        );
-      },
-    );
+    return OrientationBuilder(builder: (context, orientation) {
+      return BlocBuilder<GeneralCubit, GeneralState>(
+        builder: (context, state) {
+          return Scaffold(
+            bottomNavigationBar: Visibility(
+              visible: orientation == Orientation.portrait,
+              child: BottomNavigationBar(
+                selectedItemColor: Theme.of(context).colorScheme.primary,
+                unselectedItemColor: AppColors.gray3,
+                selectedLabelStyle: const TextStyle(fontSize: 12),
+                unselectedLabelStyle: const TextStyle(fontSize: 12),
+                showUnselectedLabels: true,
+                iconSize: 20,
+                currentIndex: state.currentIndex,
+                onTap: (index) =>
+                    context.read<GeneralCubit>().changeCurrentIndex(index),
+                items: Constants.homeItems
+                    .map((item) => BottomNavigationBarItem(
+                        icon: FaIcon(item.icon), label: item.title))
+                    .toList(),
+              ),
+            ),
+            body: Row(
+              children: [
+                Visibility(
+                  visible: orientation == Orientation.landscape,
+                  child: NavigationRail(
+                    selectedIndex: state.currentIndex,
+                    onDestinationSelected: (index) {
+                      context.read<GeneralCubit>().changeCurrentIndex(index);
+                    },
+                    labelType: NavigationRailLabelType.none,
+                    destinations: Constants.homeItems
+                        .map(
+                          (item) => NavigationRailDestination(
+                            icon: FaIcon(item.icon),
+                            label: Text(item.title),
+                            padding: const EdgeInsets.all(8),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+                Expanded(
+                  child: PageView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: context.read<GeneralCubit>().pageController,
+                    onPageChanged: (index) =>
+                        context.read<GeneralCubit>().changeCurrentIndex(index),
+                    children: const [
+                      KeepAlivePage(child: ManageUsersPage()),
+                      KeepAlivePage(child: UserLogsPage()),
+                      KeepAlivePage(child: ManageDevicesPage()),
+                      KeepAlivePage(child: ProfilePage()),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 }
-
-
 
 class KeepAlivePage extends StatefulWidget {
   final Widget child;

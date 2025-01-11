@@ -14,10 +14,13 @@ Future<void> init() async {
     ..registerLazySingleton<LoginCubit>(() => LoginCubit(injector()))
     ..registerLazySingleton<GeneralCubit>(() => GeneralCubit())
     ..registerLazySingleton<AppSettingCubit>(() => AppSettingCubit())
+    ..registerLazySingleton<DepartmentCubit>(() => DepartmentCubit())
     ..registerLazySingleton<ManageUserRepository>(() => ManageUserRepositoryImpl(injector()))
     ..registerFactory<ManageUsersCubit>(() => ManageUsersCubit(injector()))
     ..registerLazySingleton<UserLogsRepository>(() => UserLogsRepositoryImpl(injector()))
-    ..registerFactory<UserLogsCubit>(() => UserLogsCubit(injector()));
+    ..registerFactory<UserLogsCubit>(() => UserLogsCubit(injector()))
+    ..registerLazySingleton<DeviceRepository>(() => DeviceRepositoryImpl(injector()))
+    ..registerFactory<ManageDevicesCubit>(() => ManageDevicesCubit(injector()));
 
 
 }

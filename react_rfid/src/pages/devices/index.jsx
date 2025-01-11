@@ -179,7 +179,7 @@ const DevicesPage = () => {
                                 <td>{device.device_name}</td>
                                 <td>{device.device_dep}</td>
                                 <td>{device.device_uid}</td>
-                                <td>{device.device_date}</td>
+                                <td>{new Date(device.device_date).toLocaleDateString()}</td>
                                 {/* toggle device mode */}
                                 <td style={{ display: 'flex', justifyContent: 'start', gap: '10px' }}>
                                     <Button

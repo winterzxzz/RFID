@@ -20,18 +20,39 @@ const UserLogs = () => {
     limit: 20
   };
   const [pagination, setPagination] = useState(initPagination);
+  const [exportLoading, setExportLoading] = useState(false);
 
   // Filter and export function
-  const handleExport = () => {
-    // Create worksheet
-    const ws = XLSX.utils.json_to_sheet(filteredLogs);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "User Logs");
-    
-    // Export to Excel
-    // name user logs + date range
-    const dateRangeString = dateRange ? `${dateRange[0].format('YYYY-MM-DD')} to ${dateRange[1].format('YYYY-MM-DD')}` : '';
-    XLSX.writeFile(wb, `user_logs_${dateRangeString}.xlsx`);
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      let query = '';
+      if(dateRange != null) {
+        query += `?date_start=${dateRange[0]}&date_end=${dateRange[1]}`;
+      }
+      if(department != null) {
+        if(query != '') {
+          query += `&device_dep=${department}`;
+        } else {
+          query += `?device_dep=${department}`;
+        }
+      }
+      const response = await apiClient.get(`/users-log${query}`);
+      const data = response.data;
+      const users = data['data']['items'];
+
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(users);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "User Logs");
+      
+      const dateRangeString = dateRange ? `${dateRange[0].format('YYYY-MM-DD')} to ${dateRange[1].format('YYYY-MM-DD')}` : '';
+      XLSX.writeFile(wb, `user_logs_${dateRangeString}.xlsx`);
+    } catch (error) {
+      toast.error('Xuất file không thành công');
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -184,6 +205,7 @@ const UserLogs = () => {
           type="primary" 
           onClick={handleExport} 
           style={{ backgroundColor: '#0d9488' }}
+          loading={exportLoading}
         >
           XUẤT EXCEL
         </Button>

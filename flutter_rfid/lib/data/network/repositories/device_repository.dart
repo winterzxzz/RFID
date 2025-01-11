@@ -1,67 +1,80 @@
-
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:flutter_rfid/data/models/entities/device_entity.dart';
 import 'package:flutter_rfid/data/models/request/create_device_request.dart';
 import 'package:flutter_rfid/data/models/request/update_device_request.dart';
-import 'package:flutter_rfid/data/models/response/base_response.dart';
+import 'package:flutter_rfid/data/models/response/device_response.dart';
 import 'package:flutter_rfid/data/network/api_config/api_client.dart';
 import 'package:flutter_rfid/data/network/error/api_error.dart';
 
-
 abstract class DeviceRepository {
-  Future<Either<ApiError, List<DeviceEntity>>> getDevices();
-  Future<Either<ApiError, BaseResponse<DeviceEntity>>> addDevice(CreateDeviceRequest request);
-  Future<Either<ApiError, BaseResponse>> updateDevice(int id, UpdateDeviceRequest request);
-  Future<Either<ApiError, BaseResponse>> deleteDevice(int id);
+  Future<Either<ApiError, DeviceResponse>> getDevices({
+    int? page,
+    int? limit,
+  });
+  Future<Either<ApiError, DeviceEntity>> addDevice(CreateDeviceRequest request);
+  Future<Either<ApiError, String>> updateDevice(
+      int id, UpdateDeviceRequest request);
+  Future<Either<ApiError, String>> deleteDevice(int id);
 }
 
 class DeviceRepositoryImpl extends DeviceRepository {
   ApiClient apiClient;
 
   DeviceRepositoryImpl(this.apiClient);
-  
+
   @override
-  Future<Either<ApiError, BaseResponse<DeviceEntity>>> addDevice(CreateDeviceRequest request) async {
+  Future<Either<ApiError, DeviceEntity>> addDevice(
+      CreateDeviceRequest request) async {
     try {
       final response = await apiClient.addDevice(request);
-      return Right(response.data);
+      return Right(response.data!);
     } on DioException catch (e) {
       return Left(ApiError.fromJson(e.response?.data));
     }
   }
-  
+
   @override
-  Future<Either<ApiError, BaseResponse>> deleteDevice(int id) async {
+  Future<Either<ApiError, String>> deleteDevice(int id) async {
     try {
       final response = await apiClient.deleteDevice(id);
-      return Right(response.data);
+      if (response.statusCode == 200) {
+        return Right(response.message ?? 'Unknown error');
+      } else {
+        return Left(ApiError(
+            statusCode: response.statusCode, message: response.message));
+      }
     } on DioException catch (e) {
       return Left(ApiError.fromJson(e.response?.data));
     }
   }
-  
+
   @override
-  Future<Either<ApiError, List<DeviceEntity>>> getDevices() async {
+  Future<Either<ApiError, DeviceResponse>> getDevices({
+    int? page,
+    int? limit,
+  }) async {
     try {
-      final response = await apiClient.getDevices();
-      return Right(response.data ?? []);
+      final response = await apiClient.getDevices(page: page, limit: limit);
+      return Right(response.data!);
     } on DioException catch (e) {
       return Left(ApiError.fromJson(e.response?.data));
     }
   }
-  
+
   @override
-  Future<Either<ApiError, BaseResponse>> updateDevice(int id, UpdateDeviceRequest request) async {
+  Future<Either<ApiError, String>> updateDevice(
+      int id, UpdateDeviceRequest request) async {
     try {
       final response = await apiClient.updateDevice(id, request);
-      return Right(response.data);
+      if (response.statusCode == 200) {
+        return Right(response.message ?? 'Unknown error');
+      } else {
+        return Left(ApiError(
+            statusCode: response.statusCode, message: response.message));
+      }
     } on DioException catch (e) {
       return Left(ApiError.fromJson(e.response?.data));
     }
   }
-
-
-  
 }
-

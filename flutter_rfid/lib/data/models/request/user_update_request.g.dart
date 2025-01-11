@@ -13,7 +13,7 @@ UserUpdateRequest _$UserUpdateRequestFromJson(Map<String, dynamic> json) =>
       serialnumber: json['serialnumber'] as String?,
       gender: json['gender'] as String?,
       email: json['email'] as String?,
-      deviceDep: json['device_dep'] as String?,
+      deviceUid: json['device_uid'] as String?,
     );
 
 Map<String, dynamic> _$UserUpdateRequestToJson(UserUpdateRequest instance) =>
@@ -23,5 +23,5 @@ Map<String, dynamic> _$UserUpdateRequestToJson(UserUpdateRequest instance) =>
       'serialnumber': instance.serialnumber,
       'gender': instance.gender,
       'email': instance.email,
-      'device_dep': instance.deviceDep,
+      'device_uid': instance.deviceUid,
     };

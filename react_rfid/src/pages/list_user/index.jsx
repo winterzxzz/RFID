@@ -180,7 +180,7 @@ const UserList = () => {
                             <th>MÃ SINH VIÊN</th>
                             <th>GIỚI TÍNH</th>
                             <th>CARD UID</th>
-                            <th>NGÀY DANH</th>
+                            <th>NGÀY ĐĂNG KÝ</th>
                             <th>THIẾT BỊ</th>
                             <th>THAO TÁC</th>
                         </tr>
@@ -198,13 +198,7 @@ const UserList = () => {
                                 <td>{user.serialnumber}</td>
                                 <td>{user.gender}</td>
                                 <td>{user.card_uid}</td>
-                                <td>{new Date(user.user_date).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}</td>
+                                <td>{new Date(user.user_date).toLocaleDateString()}</td>
                                 <td>{user.device_dep}</td>
                                 <td>
                                     <Space>

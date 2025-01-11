@@ -2,13 +2,16 @@
 
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter_rfid/data/models/entities/manage_user_entity.dart';
 import 'package:flutter_rfid/data/models/request/user_update_request.dart';
+import 'package:flutter_rfid/data/models/response/manage_user_response.dart';
 import 'package:flutter_rfid/data/network/api_config/api_client.dart';
 import 'package:flutter_rfid/data/network/error/api_error.dart';
 
 abstract class ManageUserRepository {
-  Future<Either<ApiError, List<ManageUserEntity>>> getUsers();
+  Future<Either<ApiError, ManageUserResponse>> getUsers({
+    int? page,
+    int? limit,
+  });
   Future<Either<ApiError, String>> updateUser(UserUpdateRequest userUpdateRequest);
   Future<Either<ApiError, String>> deleteUser(int id);
 }
@@ -33,11 +36,14 @@ class ManageUserRepositoryImpl extends ManageUserRepository {
   }
   
   @override
-  Future<Either<ApiError, List<ManageUserEntity>>> getUsers() async {
+  Future<Either<ApiError, ManageUserResponse>> getUsers({
+    int? page,
+    int? limit,
+  }) async {
     try {
-      final response = await apiClient.getUsers();
+      final response = await apiClient.getUsers(page: page, limit: limit);
       if(response.statusCode == 200) {
-        return Right(response.data ?? []);
+        return Right(response.data!);
       } else {
         return Left(ApiError(statusCode: response.statusCode, message: response.message));
       }

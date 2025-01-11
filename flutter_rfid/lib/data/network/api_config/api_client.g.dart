@@ -92,39 +92,40 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<BaseResponse<List<ManageUserEntity>>> getUsers() async {
+  Future<BaseResponse<ManageUserResponse>> getUsers({
+    int? page,
+    int? limit,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'limit': limit,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options =
-        _setStreamType<BaseResponse<List<ManageUserEntity>>>(Options(
+    final _options = _setStreamType<BaseResponse<ManageUserResponse>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              '/users',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            )));
+        .compose(
+          _dio.options,
+          '/users',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<List<ManageUserEntity>> _value;
+    late BaseResponse<ManageUserResponse> _value;
     try {
-      _value = BaseResponse<List<ManageUserEntity>>.fromJson(
+      _value = BaseResponse<ManageUserResponse>.fromJson(
         _result.data!,
-        (json) => json is List<dynamic>
-            ? json
-                .map<ManageUserEntity>(
-                    (i) => ManageUserEntity.fromJson(i as Map<String, dynamic>))
-                .toList()
-            : List.empty(),
+        (json) => ManageUserResponse.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
@@ -210,12 +211,25 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<BaseResponse<List<UserLogEntity>>> getUserLogs() async {
+  Future<BaseResponse<UserLogResponse>> getUserLogs({
+    int? page,
+    int? limit,
+    String? dateStart,
+    String? dateEnd,
+    String? deviceDep,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'limit': limit,
+      r'date_start': dateStart,
+      r'date_end': dateEnd,
+      r'device_dep': deviceDep,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BaseResponse<List<UserLogEntity>>>(Options(
+    final _options = _setStreamType<BaseResponse<UserLogResponse>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -232,16 +246,11 @@ class _ApiClient implements ApiClient {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<List<UserLogEntity>> _value;
+    late BaseResponse<UserLogResponse> _value;
     try {
-      _value = BaseResponse<List<UserLogEntity>>.fromJson(
+      _value = BaseResponse<UserLogResponse>.fromJson(
         _result.data!,
-        (json) => json is List<dynamic>
-            ? json
-                .map<UserLogEntity>(
-                    (i) => UserLogEntity.fromJson(i as Map<String, dynamic>))
-                .toList()
-            : List.empty(),
+        (json) => UserLogResponse.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
@@ -251,12 +260,19 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<BaseResponse<List<DeviceEntity>>> getDevices() async {
+  Future<BaseResponse<DeviceResponse>> getDevices({
+    int? page,
+    int? limit,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'limit': limit,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BaseResponse<List<DeviceEntity>>>(Options(
+    final _options = _setStreamType<BaseResponse<DeviceResponse>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -273,16 +289,11 @@ class _ApiClient implements ApiClient {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<List<DeviceEntity>> _value;
+    late BaseResponse<DeviceResponse> _value;
     try {
-      _value = BaseResponse<List<DeviceEntity>>.fromJson(
+      _value = BaseResponse<DeviceResponse>.fromJson(
         _result.data!,
-        (json) => json is List<dynamic>
-            ? json
-                .map<DeviceEntity>(
-                    (i) => DeviceEntity.fromJson(i as Map<String, dynamic>))
-                .toList()
-            : List.empty(),
+        (json) => DeviceResponse.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
@@ -292,13 +303,14 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<BaseResponse<dynamic>> addDevice(CreateDeviceRequest request) async {
+  Future<BaseResponse<DeviceEntity>> addDevice(
+      CreateDeviceRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request.toJson());
-    final _options = _setStreamType<BaseResponse<dynamic>>(Options(
+    final _options = _setStreamType<BaseResponse<DeviceEntity>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -315,11 +327,11 @@ class _ApiClient implements ApiClient {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<dynamic> _value;
+    late BaseResponse<DeviceEntity> _value;
     try {
-      _value = BaseResponse<dynamic>.fromJson(
+      _value = BaseResponse<DeviceEntity>.fromJson(
         _result.data!,
-        (json) => json as dynamic,
+        (json) => DeviceEntity.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

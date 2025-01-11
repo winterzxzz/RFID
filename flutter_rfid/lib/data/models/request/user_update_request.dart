@@ -23,8 +23,8 @@ class UserUpdateRequest {
   String? gender;
     @JsonKey(name: "email")
     String? email;
-    @JsonKey(name: "device_dep")
-    String? deviceDep;
+    @JsonKey(name: "device_uid")
+    String? deviceUid;
 
   UserUpdateRequest({
     this.id,
@@ -32,7 +32,7 @@ class UserUpdateRequest {
     this.serialnumber,
     this.gender,
     this.email,
-    this.deviceDep,
+    this.deviceUid,
   });
 
   UserUpdateRequest copyWith({
@@ -41,7 +41,7 @@ class UserUpdateRequest {
     String? serialnumber,
     String? gender,
     String? email,
-    String? deviceDep,
+    String? deviceUid,
   }) =>
         UserUpdateRequest(
             id: id ?? this.id,
@@ -49,7 +49,7 @@ class UserUpdateRequest {
             serialnumber: serialnumber ?? this.serialnumber,
             gender: gender ?? this.gender,
             email: email ?? this.email,
-            deviceDep: deviceDep ?? this.deviceDep,
+            deviceUid: deviceUid ?? this.deviceUid,
         );
 
     factory UserUpdateRequest.fromJson(Map<String, dynamic> json) => _$UserUpdateRequestFromJson(json);

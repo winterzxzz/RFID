@@ -250,6 +250,13 @@ app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
     const { username, serialnumber, gender, email, device_uid } = req.body;
 
+    if (!device_uid) {
+        return res.status(400).json({
+            status_code: 400,
+            message: 'Device is required',
+        });
+    }
+
     db.query('SELECT * FROM devices WHERE device_uid = ?', [device_uid], (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -279,7 +286,7 @@ app.put('/users/:id', (req, res) => {
         }
         res.status(200).json({
             status_code: 200,
-            message: 'Cập nhật người dùng thành công'
+            message: 'Cập nhật người dùng thành công', 
         });
     });
     });
@@ -462,7 +469,7 @@ app.delete('/devices/:id', verifyToken, (req, res) => {
 // get all users log
 app.get('/users-log', verifyToken, (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 10000;
     const offset = (page - 1) * limit;
     const direction = req.query.direction === 'asc' ? 'ASC' : 'DESC';
 

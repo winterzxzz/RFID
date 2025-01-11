@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_rfid/common/global_blocs/deparments/department_cubit.dart';
 import 'package:flutter_rfid/common/global_blocs/user/user_cubit.dart';
 import 'package:flutter_rfid/data/network/repositories/auth_repository.dart';
+import 'package:flutter_rfid/data/network/repositories/device_repository.dart';
 import 'package:flutter_rfid/data/network/repositories/manage_user_respository.dart';
 import 'package:flutter_rfid/data/network/repositories/user_logs_repository.dart';
 import 'package:flutter_rfid/ui/page/general/general_cubit.dart';
 import 'package:flutter_rfid/ui/page/login/login_cubit.dart';
+import 'package:flutter_rfid/ui/page/manage_devices/manage_devices_cubit.dart';
 import 'package:flutter_rfid/ui/page/manage_users/manage_users_cubit.dart';
 import 'package:flutter_rfid/ui/page/splash/splash_cubit.dart';
 import 'package:flutter_rfid/ui/page/user_logs/user_logs_cubit.dart';
@@ -33,10 +36,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Setup PortraitUp only
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>(
@@ -46,9 +45,13 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<AppSettingCubit>(
-              create: (context) => injector<AppSettingCubit>()..getInitialSetting()),
+              create: (context) =>
+                  injector<AppSettingCubit>()..getInitialSetting()),
           BlocProvider<UserCubit>(
             create: (context) => injector<UserCubit>(),
+          ),
+          BlocProvider<DepartmentCubit>(
+            create: (context) => injector<DepartmentCubit>(),
           ),
         ],
         child: BlocBuilder<AppSettingCubit, AppSettingState>(
