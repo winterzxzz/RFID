@@ -66,7 +66,8 @@ const UserLogs = () => {
     // Listen for new logs
     newSocket.on('attendance', (newLog) => {
         toast.success(newLog.message);
-        handleFilter();
+        setLogs(prevLogs => [newLog.data, ...prevLogs]);
+        setFilteredLogs(prevLogs => [newLog.data, ...prevLogs]);
     });
 
     // Cleanup on component unmount

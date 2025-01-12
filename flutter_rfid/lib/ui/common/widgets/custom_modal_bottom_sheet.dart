@@ -6,7 +6,11 @@ void showCustomModalBottomSheet(BuildContext context, Widget child,
       context: context,
       showDragHandle: true,
       useRootNavigator: useRootNavigator,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      )),
       isScrollControlled: isScrollControlled, // Allows full control over height
       builder: (context) => child);
 }

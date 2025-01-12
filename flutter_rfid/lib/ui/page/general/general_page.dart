@@ -65,6 +65,7 @@ class Page extends StatelessWidget {
       return BlocBuilder<GeneralCubit, GeneralState>(
         builder: (context, state) {
           return Scaffold(
+            resizeToAvoidBottomInset: true,
             bottomNavigationBar: Visibility(
               visible: orientation == Orientation.portrait,
               child: BottomNavigationBar(
@@ -88,6 +89,7 @@ class Page extends StatelessWidget {
                 Visibility(
                   visible: orientation == Orientation.landscape,
                   child: NavigationRail(
+                    minWidth: 50,
                     selectedIndex: state.currentIndex,
                     onDestinationSelected: (index) {
                       context.read<GeneralCubit>().changeCurrentIndex(index);

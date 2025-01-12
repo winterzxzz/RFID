@@ -2,11 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { Modal } from 'antd';
 
 
+
 function Navigation() {
     const navigate = useNavigate();
+
     
-    const isLoggedIn = localStorage.getItem('token');
+    const isLoggedIn = localStorage.getItem('token') !== null || localStorage.getItem('token') !== undefined; 
     console.log(isLoggedIn);
+
 
     const handleLogout = () => {
         Modal.confirm({

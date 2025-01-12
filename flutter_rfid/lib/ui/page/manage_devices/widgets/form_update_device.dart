@@ -42,84 +42,94 @@ class _FormUpdateDeviceState extends State<FormUpdateDevice> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.65,
-      minChildSize: 0.65,
-      maxChildSize: 0.8,
+      initialChildSize: 0.9,
+      minChildSize: 0.6,
+      maxChildSize: 1.0,
+      expand: false,
       builder: (_, scrollController) {
-        return SingleChildScrollView(
-          controller: scrollController,
-          child: Form(
-            key: formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomTextField(
-                    controller: deviceNameController,
-                    label: 'Device Name',
-                    hintText: 'Enter your device name',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter device name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                    controller: deviceRoomController,
-                    label: 'Device Room',
-                    hintText: 'Enter your device room',
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (formKey.currentState?.validate() ?? false) {
-                              if (widget.device == null) {
-                                context
-                                    .read<ManageDevicesCubit>()
-                                    .addDevice(
-                                      deviceName: deviceNameController.text,
-                                      deviceDep: deviceRoomController.text,
-                                    )
-                                    .then((value) {
-                                  if (context.mounted) {
-                                    GoRouter.of(context).pop();
-                                  }
-                                });
-                              } else {
-                                context
-                                    .read<ManageDevicesCubit>()
-                                    .updateDevice(
-                                      id: widget.device!.id!,
-                                      deviceName: deviceNameController.text,
-                                      deviceDep: deviceRoomController.text,
-                                      deviceMode: 1,
-                                    )
-                                    .then((value) {
-                                  if (context.mounted) {
-                                    GoRouter.of(context).pop();
-                                  }
-                                });
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: SingleChildScrollView(
+            controller: scrollController,
+            physics: const ClampingScrollPhysics(),
+            child: Form(
+              key: formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomTextField(
+                      controller: deviceNameController,
+                      label: 'Device Name',
+                      hintText: 'Enter your device name',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter device name';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      controller: deviceRoomController,
+                      label: 'Device Room',
+                      hintText: 'Enter your device room',
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (formKey.currentState?.validate() ?? false) {
+                                if (widget.device == null) {
+                                  context
+                                      .read<ManageDevicesCubit>()
+                                      .addDevice(
+                                        deviceName: deviceNameController.text,
+                                        deviceDep: deviceRoomController.text,
+                                      )
+                                      .then((value) {
+                                    if (context.mounted) {
+                                      GoRouter.of(context).pop();
+                                    }
+                                  });
+                                } else {
+                                  context
+                                      .read<ManageDevicesCubit>()
+                                      .updateDevice(
+                                        id: widget.device!.id!,
+                                        deviceName: deviceNameController.text,
+                                        deviceDep: deviceRoomController.text,
+                                        deviceMode: 1,
+                                      )
+                                      .then((value) {
+                                    if (context.mounted) {
+                                      GoRouter.of(context).pop();
+                                    }
+                                  });
+                                }
                               }
-                            }
-                          },
-                          child: const Text('Save'),
+                            },
+                            child: const Text('Save'),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
