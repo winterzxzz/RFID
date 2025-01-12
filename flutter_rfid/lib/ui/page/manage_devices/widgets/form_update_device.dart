@@ -45,7 +45,6 @@ class _FormUpdateDeviceState extends State<FormUpdateDevice> {
       initialChildSize: 0.65,
       minChildSize: 0.65,
       maxChildSize: 0.8,
-      expand: false,
       builder: (_, scrollController) {
         return SingleChildScrollView(
           controller: scrollController,

@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rfid/app.dart';
+import 'package:flutter_rfid/common/configs/noti_config.dart';
 import 'package:flutter_rfid/common/utils/constants.dart';
+import 'package:flutter_rfid/common/configs/socket_config.dart';
 import 'package:flutter_rfid/ui/common/app_colors.dart';
 import 'package:flutter_rfid/ui/page/general/general_cubit.dart';
 import 'package:flutter_rfid/ui/page/general/general_state.dart';
@@ -11,8 +15,35 @@ import 'package:flutter_rfid/ui/page/profile/profile_page.dart';
 import 'package:flutter_rfid/ui/page/user_logs/user_logs_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class GeneralPage extends StatelessWidget {
+class GeneralPage extends StatefulWidget {
   const GeneralPage({super.key});
+
+  @override
+  State<GeneralPage> createState() => _GeneralPageState();
+}
+
+class _GeneralPageState extends State<GeneralPage> {
+  @override
+  void initState() {
+    super.initState();
+    SocketConfig.socket.on('attendance', (data) async {
+      log('attendance: $data');
+      await NotificationService().showNotification(
+        1,
+        'Attendance',
+        data['message'],
+      );
+    });
+
+    SocketConfig.socket.on('add-card', (data) async {
+      log('add-card: $data');
+      await NotificationService().showNotification(
+        1,
+        'Add Card',
+        data['message'],
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -92,6 +92,7 @@ class Page extends StatelessWidget {
                     } else {
                       return SliverToBoxAdapter(
                         child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           scrollDirection: Axis.horizontal,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -275,5 +276,4 @@ class Page extends StatelessWidget {
       ),
     );
   }
-
 }

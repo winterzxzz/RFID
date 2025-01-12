@@ -126,7 +126,7 @@ class Page extends StatelessWidget {
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
-                                                .withOpacity(0.1)
+                                                .withOpacity(0.5)
                                             : null,
                                       ),
                                       children: [

@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rfid/app.dart';
+import 'package:flutter_rfid/common/configs/socket_config.dart';
 import 'package:flutter_rfid/common/global_blocs/deparments/department_cubit.dart';
+import 'package:flutter_rfid/data/models/entities/manage_user_entity.dart';
 import 'package:flutter_rfid/data/models/enums/load_status.dart';
 import 'package:flutter_rfid/data/models/request/user_update_request.dart';
 import 'package:flutter_rfid/data/network/repositories/manage_user_respository.dart';
@@ -12,7 +14,25 @@ class ManageUsersCubit extends Cubit<ManageUsersState> {
   final ManageUserRepository manageUserRepository;
 
   ManageUsersCubit(this.manageUserRepository)
-      : super(ManageUsersState.initial());
+      : super(ManageUsersState.initial()) {
+    SocketConfig.socket.on('add-card', (data) async {
+      final newUser = ManageUserEntity.fromJson(data['data']);
+      // if user already exist, update it else add it
+      if (isUserExist(newUser)) {
+        final newList = state.users
+            .map((user) => user.id == newUser.id ? newUser : user)
+            .toList();
+        emit(state.copyWith(users: newList));
+      } else {
+        final newList = [newUser, ...state.users];
+        emit(state.copyWith(users: newList));
+      }
+    });
+  }
+
+  bool isUserExist(ManageUserEntity user) {
+    return state.users.any((u) => u.id == user.id);
+  }
 
   Future<void> getUsers() async {
     emit(state.copyWith(loadStatus: LoadStatus.loading));

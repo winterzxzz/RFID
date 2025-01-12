@@ -603,17 +603,26 @@ app.post('/users-log', async (req, res) => {
             // Handle login/logout
             if (!incompleteLog) {
                 // Create new check-in entry
-                await db.promise().query(
+                const [result] = await db.promise().query(
                     'INSERT INTO users_logs (username, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                     [user.username, user.serialnumber, card_uid, device_uid, device_dep, currentDate, currentTime, '00:00:00']
                 );
+
+
+                const [newLogs] = await db.promise().query('SELECT * FROM users_logs WHERE id = ?', [result.insertId]);
+                const newLog = newLogs[0];
+
+
+                
                 io.emit('attendance', {
                     status_code: 200,
                     message: 'CHECK IN ' + user.username,
+                    data: newLog
                 });
                 return res.status(200).json({
                     status_code: 200,
                     message: 'CHECK IN ' + convertVietnameseNameToEnglish(user.username),
+                    data: newLog
                 });
             } else {
                 // Complete the existing check-in with a timeout
@@ -621,14 +630,20 @@ app.post('/users-log', async (req, res) => {
                     'UPDATE users_logs SET timeout = ? WHERE id = ?',
                     [currentTime, incompleteLog.id]
                 );
+
+                const [newLogs] = await db.promise().query('SELECT * FROM users_logs WHERE id = ?', [incompleteLog.id]);
+                const newLog = newLogs[0];
+
                 io.emit('attendance', {
                     status_code: 200,
                     message: 'CHECK OUT ' + user.username,
+                    data: newLog
                 });
                 return res.status(200).json({
                     status_code: 200,
                     // convert user.name to from vietnamese to english
                     message: 'CHECK OUT ' + convertVietnameseNameToEnglish(user.username),
+                    data: newLog
                 });
             }
         }
@@ -640,10 +655,6 @@ app.post('/users-log', async (req, res) => {
             if (existingCard) {
                 await db.promise().query('UPDATE users SET card_select = 0');
                 await db.promise().query('UPDATE users SET card_select = 1 WHERE card_uid = ?', [card_uid]);
-                io.emit('add-card', {
-                    status_code: 400,
-                    message: 'Card ' + card_uid + ' already registered',
-                });
                 return res.status(400).json({
                     status_code: 400,
                     message: 'Card ' + card_uid + ' already registered',

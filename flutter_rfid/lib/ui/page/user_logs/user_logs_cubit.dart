@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rfid/common/configs/socket_config.dart';
 import 'package:flutter_rfid/data/models/entities/user_log_entity.dart';
 import 'package:flutter_rfid/data/models/enums/load_status.dart';
 import 'package:flutter_rfid/data/network/repositories/user_logs_repository.dart';
@@ -15,7 +16,25 @@ import 'dart:io';
 class UserLogsCubit extends Cubit<UserLogsState> {
   final UserLogsRepository userLogsRepository;
 
-  UserLogsCubit(this.userLogsRepository) : super(UserLogsState.initial());
+  UserLogsCubit(this.userLogsRepository) : super(UserLogsState.initial()) {
+    SocketConfig.socket.on('attendance', (data) async {
+      final newUser = UserLogEntity.fromJson(data['data']);
+      // if user already exist, update it else add it
+      if (isUserExist(newUser)) {
+        final newList = state.users
+            .map((user) => user.id == newUser.id ? newUser : user)
+            .toList();
+        emit(state.copyWith(users: newList));
+      } else {
+        final newList = [newUser, ...state.users];
+        emit(state.copyWith(users: newList));
+      }
+    });
+  }
+
+  bool isUserExist(UserLogEntity user) {
+    return state.users.any((u) => u.id == user.id);
+  }
 
   Future<void> getUsers() async {
     emit(state.copyWith(loadStatus: LoadStatus.loading));
