@@ -173,8 +173,10 @@ class Page extends StatelessWidget {
                                                   const EdgeInsets.all(8.0),
                                               child: Text(
                                                   DateFormat('dd/MM/yyyy')
-                                                      .format(user.deviceDate ??
-                                                          DateTime.now())),
+                                                      .format((user
+                                                                  .deviceDate ??
+                                                              DateTime.now())
+                                                          .toLocal())),
                                             )),
                                         TableCell(
                                             child: Padding(

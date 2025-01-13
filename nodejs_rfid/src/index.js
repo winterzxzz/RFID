@@ -150,6 +150,12 @@ app.post('/login', (req, res) => {
 app.get('/user-info', verifyToken, (req, res) => {
     const query = 'SELECT * FROM admin WHERE admin_email = ?';
     db.query(query, [req.admin.email], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                status_code: 500,
+                message: 'Lỗi lấy thông tin người dùng',
+            });
+        }
         res.status(200).json({
             status_code: 200,
             message: 'Lấy thông tin người dùng thành công',

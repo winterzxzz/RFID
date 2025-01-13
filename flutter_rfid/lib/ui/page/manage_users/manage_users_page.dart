@@ -161,8 +161,9 @@ class Page extends StatelessWidget {
                                             child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(DateFormat('dd/MM/yyyy')
-                                              .format(user.userDate ??
-                                                  DateTime.now())),
+                                              .format((user.userDate ??
+                                                      DateTime.now())
+                                                  .toLocal())),
                                         )),
                                         TableCell(
                                             child: Row(
