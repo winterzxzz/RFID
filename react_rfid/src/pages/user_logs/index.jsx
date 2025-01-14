@@ -66,8 +66,32 @@ const UserLogs = () => {
     // Listen for new logs
     newSocket.on('attendance', (newLog) => {
         toast.success(newLog.message);
-        setLogs(prevLogs => [newLog.data, ...prevLogs]);
-        setFilteredLogs(prevLogs => [newLog.data, ...prevLogs]);
+        
+        setLogs(prevLogs => {
+            const index = prevLogs.findIndex(log => log.id === newLog.data.id);
+            if (index !== -1) {
+                // Update existing log
+                const updatedLogs = [...prevLogs];
+                updatedLogs[index] = newLog.data;
+                return updatedLogs;
+            } else {
+                // Add new log at the beginning
+                return [newLog.data, ...prevLogs];
+            }
+        });
+
+        setFilteredLogs(prevFilteredLogs => {
+            const index = prevFilteredLogs.findIndex(log => log.id === newLog.data.id);
+            if (index !== -1) {
+                // Update existing log
+                const updatedLogs = [...prevFilteredLogs];
+                updatedLogs[index] = newLog.data;
+                return updatedLogs;
+            } else {
+                // Add new log at the beginning
+                return [newLog.data, ...prevFilteredLogs];
+            }
+        });
     });
 
     // Cleanup on component unmount
