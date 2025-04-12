@@ -37,9 +37,7 @@ app.get('/', (req, res) => {
 });
 
 // API routes
-app.use('/login', authRoutes);
-app.use('/user-info', authRoutes);
-app.use('/change-password', authRoutes);
+app.use('/', authRoutes);
 app.use('/users', userRoutes);
 app.use('/devices', deviceRoutes);
 app.use('/user-devices', userDeviceRoutes);

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_rfid/common/global_blocs/deparments/department_cubit.dart';
-import 'package:flutter_rfid/common/global_blocs/deparments/department_state.dart';
 import 'package:flutter_rfid/data/models/entities/manage_user_entity.dart';
 import 'package:flutter_rfid/ui/common/widgets/custom_text_field.dart';
 import 'package:flutter_rfid/ui/page/manage_users/manage_users_cubit.dart';
@@ -22,16 +20,11 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
   late final TextEditingController serialNumberController;
   late String? selectedGender;
   late final TextEditingController emailController;
-  late String? selectedDepartment;
-  late String? selectedDepartmentDep;
 
   @override
   void initState() {
     super.initState();
-    selectedDepartment =
-        widget.user.deviceUid == 'None' ? null : widget.user.deviceUid;
-    selectedDepartmentDep =
-        widget.user.deviceDep == 'None' ? null : widget.user.deviceDep;
+    widget.user.deviceDep == 'None' ? null : widget.user.deviceDep;
     selectedGender = widget.user.gender == 'None' ? null : widget.user.gender;
     usernameController = TextEditingController(
         text: widget.user.username == 'None' ? null : widget.user.username);
@@ -116,32 +109,6 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    BlocBuilder<DepartmentCubit, DepartmentState>(
-                      builder: (context, state) {
-                        return DropdownButtonFormField<String>(
-                          value: selectedDepartment,
-                          decoration: const InputDecoration(
-                            labelText: 'Department',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: state.departments.map((department) {
-                            return DropdownMenuItem<String>(
-                              value: department.deviceUid,
-                              child: Text(department.deviceDep ?? ''),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              selectedDepartment = newValue;
-                              final newDep = state.departments.firstWhere(
-                                  (element) => element.deviceUid == newValue);
-                              selectedDepartmentDep = newDep.deviceDep;
-                            }
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
                     const Divider(),
                     const SizedBox(height: 16),
                     Row(
@@ -161,8 +128,6 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
                                       serialnumber: serialNumberController.text,
                                       gender: selectedGender ?? '',
                                       email: emailController.text,
-                                      deviceUid: selectedDepartment ?? '',
-                                      deviceDep: selectedDepartmentDep ?? '',
                                     )
                                     .then((value) {
                                   if (context.mounted) {

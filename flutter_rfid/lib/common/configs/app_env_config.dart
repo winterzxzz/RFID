@@ -19,7 +19,7 @@ extension EnvironmentExt on Environment {
   String get baseUrl {
     switch (this) {
       case Environment.dev:
-        return "https://d7b8-2401-d800-254-3189-4dd3-c2ae-b794-6831.ngrok-free.app";
+        return "https://5cf2-42-114-170-11.ngrok-free.app";
       case Environment.stg:
         return "http://stg";
       case Environment.prod:

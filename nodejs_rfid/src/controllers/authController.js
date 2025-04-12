@@ -6,6 +6,14 @@ const env = require('../config/env');
 // login admin
 const login = (req, res) => {
     const { admin_email, admin_pwd } = req.body;
+    if (!admin_email || !admin_pwd) {
+        return res.status(400).json({
+            status_code: 400,
+            message: 'Vui lòng nhập đầy đủ thông tin',
+        });
+    }
+
+
     const query = 'SELECT * FROM admin WHERE admin_email = ?';
 
     db.query(query, [admin_email], (err, result) => {

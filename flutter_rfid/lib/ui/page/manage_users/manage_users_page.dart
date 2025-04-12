@@ -85,17 +85,22 @@ class Page extends StatelessWidget {
                                       TableCell(
                                           child: Padding(
                                         padding: EdgeInsets.all(8.0),
-                                        child: Text('ID/Username'),
+                                        child: Text('ID | Tên'),
                                       )),
                                       TableCell(
                                           child: Padding(
                                         padding: EdgeInsets.all(8.0),
-                                        child: Text('Serial Number'),
+                                        child: Text('MÃ SINH VIÊN'),
                                       )),
                                       TableCell(
                                           child: Padding(
                                         padding: EdgeInsets.all(8.0),
-                                        child: Text('Gender'),
+                                        child: Text('GIỚI TÍNH'),
+                                      )),
+                                      TableCell(
+                                          child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('EMAIL'),
                                       )),
                                       TableCell(
                                           child: Padding(
@@ -105,17 +110,12 @@ class Page extends StatelessWidget {
                                       TableCell(
                                           child: Padding(
                                         padding: EdgeInsets.all(8.0),
-                                        child: Text('Department'),
+                                        child: Text('NGÀY ĐĂNG KÝ'),
                                       )),
                                       TableCell(
                                           child: Padding(
                                         padding: EdgeInsets.all(8.0),
-                                        child: Text('Date'),
-                                      )),
-                                      TableCell(
-                                          child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text('Actions'),
+                                        child: Text('HÀNH ĐỘNG'),
                                       )),
                                     ],
                                   ),
@@ -150,12 +150,12 @@ class Page extends StatelessWidget {
                                         TableCell(
                                             child: Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Text(user.cardUid ?? 'None'),
+                                          child: Text(user.email ?? 'None'),
                                         )),
                                         TableCell(
                                             child: Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Text(user.deviceDep ?? 'None'),
+                                          child: Text(user.cardUid ?? 'None'),
                                         )),
                                         TableCell(
                                             child: Padding(
@@ -262,7 +262,7 @@ class Page extends StatelessWidget {
 
   void _onDelete(BuildContext context, int id) {
     return showConfirmDialog(
-        context, 'Delete User', 'Are you sure you want to delete this user?',
+        context, 'Xóa tài khoản', 'Bạn có chắc chắn muốn xóa tài khoản này?',
         () {
       context.read<ManageUsersCubit>().deleteUser(id);
     });

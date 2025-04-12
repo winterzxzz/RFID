@@ -36,7 +36,8 @@ class ManageUsersCubit extends Cubit<ManageUsersState> {
 
   Future<void> getUsers() async {
     emit(state.copyWith(loadStatus: LoadStatus.loading));
-    final result = await manageUserRepository.getUsers();
+    final result = await manageUserRepository.getUsers(
+        page: state.currentPage, limit: state.itemsPerPage);
     result.fold((l) {
       emit(state.copyWith(loadStatus: LoadStatus.failure, message: l.message));
     }, (r) {
@@ -72,8 +73,6 @@ class ManageUsersCubit extends Cubit<ManageUsersState> {
     required String serialnumber,
     required String gender,
     required String email,
-    required String deviceUid,
-    required String deviceDep,
   }) async {
     emit(state.copyWith(loadStatus: LoadStatus.loading));
     final result = await manageUserRepository.updateUser(UserUpdateRequest(
@@ -82,7 +81,6 @@ class ManageUsersCubit extends Cubit<ManageUsersState> {
       serialnumber: serialnumber,
       gender: gender,
       email: email,
-      deviceUid: deviceUid,
     ));
     result.fold((error) {
       emit(state.copyWith(
@@ -95,8 +93,6 @@ class ManageUsersCubit extends Cubit<ManageUsersState> {
                   serialnumber: serialnumber,
                   gender: gender,
                   email: email,
-                  deviceUid: deviceUid,
-                  deviceDep: deviceDep,
                 )
               : user)
           .toList();
