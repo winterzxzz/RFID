@@ -9,6 +9,7 @@ import 'package:flutter_rfid/data/network/repositories/auth_repository.dart';
 import 'package:flutter_rfid/data/network/repositories/device_repository.dart';
 import 'package:flutter_rfid/data/network/repositories/manage_user_respository.dart';
 import 'package:flutter_rfid/data/network/repositories/user_logs_repository.dart';
+import 'package:flutter_rfid/ui/page/device_detail/device_detail_cubit.dart';
 import 'package:flutter_rfid/ui/page/general/general_cubit.dart';
 import 'package:flutter_rfid/ui/page/login/login_cubit.dart';
 import 'package:flutter_rfid/ui/page/manage_devices/manage_devices_cubit.dart';

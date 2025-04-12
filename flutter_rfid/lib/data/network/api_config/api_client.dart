@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart' hide Headers;
+import 'package:flutter_rfid/data/models/entities/device_detail.dart';
 import 'package:flutter_rfid/data/models/entities/device_entity.dart';
 import 'package:flutter_rfid/data/models/entities/user_entity.dart';
 import 'package:flutter_rfid/data/models/request/create_device_request.dart';
@@ -62,4 +63,13 @@ abstract class ApiClient {
 
   @DELETE("/devices/{id}")
   Future<BaseResponse> deleteDevice(@Path("id") int id);
+
+  @GET("/user-devices/{id}")
+  Future<BaseResponse<List<DeviceDetail>>> getDeviceDetail(@Path("id") int id);
+
+  // delete user device
+  @DELETE("/user-devices/{userId}/{deviceId}")
+  Future<BaseResponse> deleteUserDevice(@Path("userId") int userId, @Path("deviceId") int deviceId);
+
+
 }

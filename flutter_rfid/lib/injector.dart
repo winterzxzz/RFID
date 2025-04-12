@@ -20,7 +20,8 @@ Future<void> init() async {
     ..registerLazySingleton<UserLogsRepository>(() => UserLogsRepositoryImpl(injector()))
     ..registerFactory<UserLogsCubit>(() => UserLogsCubit(injector()))
     ..registerLazySingleton<DeviceRepository>(() => DeviceRepositoryImpl(injector()))
-    ..registerFactory<ManageDevicesCubit>(() => ManageDevicesCubit(injector()));
+    ..registerFactory<ManageDevicesCubit>(() => ManageDevicesCubit(injector()))
+    ..registerFactory<DeviceDetailCubit>(() => DeviceDetailCubit(injector()));
 
 
 }

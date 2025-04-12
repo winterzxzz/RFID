@@ -2,32 +2,36 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rfid/app.dart';
-import 'package:flutter_rfid/data/models/entities/manage_user_entity.dart';
+import 'package:flutter_rfid/data/models/entities/device_entity.dart';
 import 'package:flutter_rfid/data/models/enums/load_status.dart';
-import 'package:flutter_rfid/ui/common/widgets/build_pagination_number.dart';
+import 'package:flutter_rfid/ui/common/app_navigator.dart';
 import 'package:flutter_rfid/ui/common/widgets/confirm_dia_log.dart';
-import 'package:flutter_rfid/ui/common/widgets/custom_modal_bottom_sheet.dart';
-import 'package:flutter_rfid/ui/page/manage_users/manage_users_cubit.dart';
-import 'package:flutter_rfid/ui/page/manage_users/manage_users_state.dart';
-import 'package:flutter_rfid/ui/page/manage_users/widgets/form_update_user.dart';
+import 'package:flutter_rfid/ui/common/widgets/show_toast.dart';
+import 'package:flutter_rfid/ui/page/device_detail/device_detail_cubit.dart';
+import 'package:flutter_rfid/ui/page/device_detail/device_detail_state.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:toastification/toastification.dart';
 
-class ManageUsersPage extends StatelessWidget {
-  const ManageUsersPage({super.key});
+class DeviceDetailPage extends StatelessWidget {
+  final DeviceEntity device;
+  const DeviceDetailPage({super.key, required this.device});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => injector<ManageUsersCubit>()..getUsers(),
-      child: const Page(),
+      create: (context) =>
+          injector<DeviceDetailCubit>()..getDeviceDetail(device),
+      child: Page(device: device),
     );
   }
 }
 
 class Page extends StatelessWidget {
+  final DeviceEntity device;
   const Page({
     super.key,
+    required this.device,
   });
 
   @override
@@ -37,25 +41,51 @@ class Page extends StatelessWidget {
         header: const BezierHeader(
           position: IndicatorPosition.above,
         ),
-        onRefresh: () => context.read<ManageUsersCubit>().getUsers(),
+        onRefresh: () =>
+            context.read<DeviceDetailCubit>().getDeviceDetail(device),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            const SliverAppBar(
-              title: Text('Manage Users'),
+            SliverAppBar(
+              title: const Text('Manage Users'),
               floating: true,
               snap: true,
+              actions: [
+                IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.fileExcel, size: 20),
+                  onPressed: () =>
+                      context.read<DeviceDetailCubit>().exportToExcel(),
+                ),
+                IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 20),
+                  onPressed: () => _onInfo(context, device),
+                ),
+              ],
             ),
-            BlocBuilder<ManageUsersCubit, ManageUsersState>(
+            BlocConsumer<DeviceDetailCubit, DeviceDetailState>(
+              listener: (context, state) {
+                if (state.loadStatus == LoadStatus.loading ||
+                    state.exportStatus == LoadStatus.loading) {
+                  AppNavigator(context: context).showLoadingOverlay();
+                } else {
+                  AppNavigator(context: context).hideLoadingOverlay();
+
+                  if (state.loadStatus == LoadStatus.failure ||
+                      state.exportStatus == LoadStatus.failure) {
+                    showToast(
+                        title: state.message, type: ToastificationType.error);
+                  } else if (state.loadStatus == LoadStatus.success ||
+                      state.exportStatus == LoadStatus.success) {
+                    showToast(
+                        title: state.message, type: ToastificationType.success);
+                  }
+                }
+              },
               builder: (context, state) {
-                if (state.loadStatus == LoadStatus.loading) {
-                  return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                } else if (state.loadStatus == LoadStatus.success) {
-                  if (state.users.isEmpty) {
+                if (state.loadStatus == LoadStatus.success) {
+                  if (state.deviceDetail.isEmpty) {
                     return const SliverFillRemaining(
-                      child: Center(child: Text('No users found')),
+                      child: Center(child: Text('No device detail found')),
                     );
                   } else {
                     return SliverToBoxAdapter(
@@ -69,12 +99,12 @@ class Page extends StatelessWidget {
                                 border: TableBorder.all(),
                                 columnWidths: const {
                                   0: FixedColumnWidth(200), // ID/Username
-                                  1: FixedColumnWidth(150), // Serial Number
+                                  1: FixedColumnWidth(120), // Serial Number
                                   2: FixedColumnWidth(100), // Gender
-                                  3: FixedColumnWidth(250), // Email
-                                  4: FixedColumnWidth(150), // Card UID
+                                  3: FixedColumnWidth(150), // Card UID
+                                  4: FixedColumnWidth(120), // Department
                                   5: FixedColumnWidth(150), // Date
-                                  6: FixedColumnWidth(150), // Actions
+                                  6: FixedColumnWidth(120), // Actions
                                 },
                                 children: [
                                   TableRow(
@@ -119,7 +149,7 @@ class Page extends StatelessWidget {
                                       )),
                                     ],
                                   ),
-                                  ...state.users.map((user) {
+                                  ...state.deviceDetail.map((user) {
                                     return TableRow(
                                       decoration: BoxDecoration(
                                         color: user.addCard == 0
@@ -171,21 +201,14 @@ class Page extends StatelessWidget {
                                           children: [
                                             IconButton(
                                               icon: const FaIcon(
-                                                FontAwesomeIcons.penToSquare,
-                                                size: 16,
-                                              ),
-                                              onPressed: () =>
-                                                  _onEdit(context, user),
-                                            ),
-                                            IconButton(
-                                              icon: const FaIcon(
                                                 FontAwesomeIcons.trash,
                                                 size: 16,
                                                 color: Colors.red,
                                               ),
                                               onPressed: () {
                                                 if (user.id != null) {
-                                                  _onDelete(context, user.id!);
+                                                  _onDelete(context, user.id!,
+                                                      device.id!);
                                                 }
                                               },
                                             ),
@@ -196,54 +219,6 @@ class Page extends StatelessWidget {
                                   }),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.chevron_left),
-                                    onPressed: state.currentPage > 1
-                                        ? () => context
-                                            .read<ManageUsersCubit>()
-                                            .changePage(state.currentPage - 1)
-                                        : null,
-                                  ),
-                                  ...buildPaginationNumbers(
-                                    currentPage: state.currentPage,
-                                    totalPages: state.totalPages,
-                                    onPageSelected: (page) => context
-                                        .read<ManageUsersCubit>()
-                                        .changePage(page),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.chevron_right),
-                                    onPressed: state.currentPage <
-                                            state.totalPages
-                                        ? () => context
-                                            .read<ManageUsersCubit>()
-                                            .changePage(state.currentPage + 1)
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 16),
-                                  DropdownButton<int>(
-                                    alignment: Alignment.center,
-                                    value: state.itemsPerPage,
-                                    items: [10, 20, 30, 40, 50, 70, 100]
-                                        .map((value) {
-                                      return DropdownMenuItem<int>(
-                                        value: value,
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text('$value / page'),
-                                        ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) => context
-                                        .read<ManageUsersCubit>()
-                                        .changeItemsPerPage(value!),
-                                  ),
-                                ],
-                              )
                             ],
                           ),
                         ),
@@ -260,20 +235,131 @@ class Page extends StatelessWidget {
     );
   }
 
-  void _onDelete(BuildContext context, int id) {
+  void _onDelete(BuildContext context, int userId, int deviceId) {
     return showConfirmDialog(
         context, 'Xóa tài khoản', 'Bạn có chắc chắn muốn xóa tài khoản này?',
         () {
-      context.read<ManageUsersCubit>().deleteUser(id);
+      context.read<DeviceDetailCubit>().deleteUserDevice(userId, deviceId);
     });
   }
 
-  void _onEdit(BuildContext context, ManageUserEntity user) {
-    showCustomModalBottomSheet(
-        context,
-        BlocProvider.value(
-          value: context.read<ManageUsersCubit>(),
-          child: FormUpdateUser(user: user),
-        ));
+  Future<void> _onInfo(BuildContext context, DeviceEntity device) {
+    return showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.all(24),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+              Center(
+                child: Text(
+                  device.deviceName ?? 'N/A',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Center(
+                child: Text(
+                  device.deviceDep ?? 'N/A',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFD4AF37),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 12),
+              const Row(
+                children: [
+                  Icon(Icons.link, color: Color(0xFFD4AF37)),
+                  SizedBox(width: 8),
+                  Text(
+                    'Trạng thái:',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'ĐĂNG KÝ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(Icons.email, color: Color(0xFFD4AF37)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'ID:',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${device.id ?? "N/A"}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(Icons.devices, color: Color(0xFFD4AF37)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Mã thiết bị:',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    device.deviceUid ?? "N/A",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(Icons.date_range, color: Color(0xFFD4AF37)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Ngày cập nhật:',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    device.deviceDate != null
+                        ? DateFormat('dd/MM/yyyy')
+                            .format(device.deviceDate!.toLocal())
+                        : "N/A",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

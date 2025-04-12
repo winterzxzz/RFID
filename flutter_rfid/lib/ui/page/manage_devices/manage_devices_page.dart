@@ -2,6 +2,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rfid/app.dart';
+import 'package:flutter_rfid/common/router/route_config.dart';
 import 'package:flutter_rfid/data/models/entities/device_entity.dart';
 import 'package:flutter_rfid/data/models/enums/load_status.dart';
 import 'package:flutter_rfid/ui/common/widgets/build_pagination_number.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_rfid/ui/page/manage_devices/manage_devices_cubit.dart';
 import 'package:flutter_rfid/ui/page/manage_devices/manage_devices_state.dart';
 import 'package:flutter_rfid/ui/page/manage_devices/widgets/form_update_device.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class ManageDevicesPage extends StatelessWidget {
@@ -75,11 +77,11 @@ class Page extends StatelessWidget {
                                 border: TableBorder.all(),
                                 columnWidths: const {
                                   0: FixedColumnWidth(100), // Device Name
-                                  1: FixedColumnWidth(80), // Room
+                                  1: FixedColumnWidth(100), // Room
                                   2: FixedColumnWidth(150), // Device UID
                                   3: FixedColumnWidth(100), // Date
-                                  4: FixedColumnWidth(150), // Status
-                                  5: FixedColumnWidth(100), // Actions
+                                  4: FixedColumnWidth(250), // Status
+                                  5: FixedColumnWidth(200), // Actions
                                 },
                                 children: [
                                   TableRow(
@@ -92,42 +94,42 @@ class Page extends StatelessWidget {
                                               TableCellVerticalAlignment.middle,
                                           child: Padding(
                                             padding: EdgeInsets.all(8.0),
-                                            child: Text('Device Name'),
+                                            child: Text('ID | TÊN'),
                                           )),
                                       TableCell(
                                           verticalAlignment:
                                               TableCellVerticalAlignment.middle,
                                           child: Padding(
                                             padding: EdgeInsets.all(8.0),
-                                            child: Text('Room'),
+                                            child: Text('PHÒNG'),
                                           )),
                                       TableCell(
                                           verticalAlignment:
                                               TableCellVerticalAlignment.middle,
                                           child: Padding(
                                             padding: EdgeInsets.all(8.0),
-                                            child: Text('Device UID'),
+                                            child: Text('MÃ THIẾT BỊ'),
                                           )),
                                       TableCell(
                                           verticalAlignment:
                                               TableCellVerticalAlignment.middle,
                                           child: Padding(
                                             padding: EdgeInsets.all(8.0),
-                                            child: Text('Date'),
+                                            child: Text('NGÀY TẠO'),
                                           )),
                                       TableCell(
                                           verticalAlignment:
                                               TableCellVerticalAlignment.middle,
                                           child: Padding(
                                             padding: EdgeInsets.all(8.0),
-                                            child: Text('Status'),
+                                            child: Text('TRẠNG THÁI'),
                                           )),
                                       TableCell(
                                           verticalAlignment:
                                               TableCellVerticalAlignment.middle,
                                           child: Padding(
                                             padding: EdgeInsets.all(8.0),
-                                            child: Text('Actions'),
+                                            child: Text('HÀNH ĐỘNG'),
                                           )),
                                     ],
                                   ),
@@ -142,7 +144,7 @@ class Page extends StatelessWidget {
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: Text(
-                                                  user.deviceName ?? 'None'),
+                                                  '${user.id} | ${user.deviceName}'),
                                             )),
                                         TableCell(
                                             verticalAlignment:
@@ -181,18 +183,27 @@ class Page extends StatelessWidget {
                                         TableCell(
                                             child: Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Column(
+                                          child: Row(
                                             children: [
                                               SizedBox(
-                                                width: 120,
-                                                height: 50,
+                                                height: 33,
                                                 child: ElevatedButton(
                                                   style:
                                                       ElevatedButton.styleFrom(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 0,
+                                                        horizontal: 12),
                                                     backgroundColor:
                                                         user.deviceMode == 0
                                                             ? Colors.blue
                                                             : Colors.grey,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                    ),
                                                   ),
                                                   onPressed: () {
                                                     context
@@ -201,21 +212,34 @@ class Page extends StatelessWidget {
                                                         .changeDeviceMode(
                                                             user, 0);
                                                   },
-                                                  child:
-                                                      const Text('Enrollment'),
+                                                  child: const Text(
+                                                    'Enrollment',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                              const SizedBox(height: 5),
+                                              const SizedBox(width: 16),
                                               SizedBox(
-                                                width: 120,
-                                                height: 50,
+                                                height: 33,
                                                 child: ElevatedButton(
                                                   style:
                                                       ElevatedButton.styleFrom(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 0,
+                                                        horizontal: 12),
                                                     backgroundColor:
                                                         user.deviceMode == 1
                                                             ? Colors.blue
                                                             : Colors.grey,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                    ),
                                                   ),
                                                   onPressed: () {
                                                     context
@@ -224,8 +248,12 @@ class Page extends StatelessWidget {
                                                         .changeDeviceMode(
                                                             user, 1);
                                                   },
-                                                  child:
-                                                      const Text('Attendance'),
+                                                  child: const Text(
+                                                    'Attendance',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -238,6 +266,15 @@ class Page extends StatelessWidget {
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
+                                                IconButton(
+                                                  icon: const FaIcon(
+                                                    FontAwesomeIcons.eye,
+                                                    size: 16,
+                                                  ),
+                                                  onPressed: () =>
+                                                      _onViewDetail(
+                                                          context, user),
+                                                ),
                                                 IconButton(
                                                   icon: const FaIcon(
                                                     FontAwesomeIcons
@@ -354,5 +391,11 @@ class Page extends StatelessWidget {
           value: context.read<ManageDevicesCubit>(),
           child: FormUpdateDevice(device: device),
         ));
+  }
+
+  void _onViewDetail(BuildContext context, DeviceEntity device) {
+    GoRouter.of(context).pushNamed(AppRouter.deviceDetail, extra: {
+      'device': device,
+    });
   }
 }

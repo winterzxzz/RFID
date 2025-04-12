@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
+import 'package:flutter_rfid/data/models/entities/device_detail.dart';
 import 'package:flutter_rfid/data/models/entities/device_entity.dart';
 import 'package:flutter_rfid/data/models/request/create_device_request.dart';
 import 'package:flutter_rfid/data/models/request/update_device_request.dart';
@@ -16,6 +17,10 @@ abstract class DeviceRepository {
   Future<Either<ApiError, String>> updateDevice(
       int id, UpdateDeviceRequest request);
   Future<Either<ApiError, String>> deleteDevice(int id);
+
+  Future<Either<ApiError, List<DeviceDetail>>> getDeviceDetail(int id);
+
+  Future<Either<ApiError, String>> deleteUserDevice(int userId, int deviceId);
 }
 
 class DeviceRepositoryImpl extends DeviceRepository {
@@ -67,6 +72,37 @@ class DeviceRepositoryImpl extends DeviceRepository {
       int id, UpdateDeviceRequest request) async {
     try {
       final response = await apiClient.updateDevice(id, request);
+      if (response.statusCode == 200) {
+        return Right(response.message ?? 'Unknown error');
+      } else {
+        return Left(ApiError(
+            statusCode: response.statusCode, message: response.message));
+      }
+    } on DioException catch (e) {
+      return Left(ApiError.fromJson(e.response?.data));
+    }
+  }
+
+  @override
+  Future<Either<ApiError, List<DeviceDetail>>> getDeviceDetail(int id) async {
+    try {
+      final response = await apiClient.getDeviceDetail(id);
+      if (response.statusCode == 200) {
+        return Right(response.data!);
+      } else {
+        return Left(ApiError(
+            statusCode: response.statusCode, message: response.message));
+      }
+    } on DioException catch (e) {
+      return Left(ApiError.fromJson(e.response?.data));
+    }
+  }
+
+  @override
+  Future<Either<ApiError, String>> deleteUserDevice(
+      int userId, int deviceId) async {
+    try {
+      final response = await apiClient.deleteUserDevice(userId, deviceId);
       if (response.statusCode == 200) {
         return Right(response.message ?? 'Unknown error');
       } else {

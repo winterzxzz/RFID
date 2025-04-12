@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rfid/data/models/entities/device_entity.dart';
+import 'package:flutter_rfid/ui/page/device_detail/device_detail_page.dart';
 import 'package:flutter_rfid/ui/page/general/general_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_rfid/data/database/share_preferences_helper.dart';
@@ -33,6 +35,8 @@ class AppRouter {
   // App routes
   static const String general = '/general';
 
+  static const String deviceDetail = '/device-detail';
+
 
 
   // GoRouter configuration
@@ -51,6 +55,15 @@ class AppRouter {
       name: general,
       path: general,
       builder: (context, state) => const GeneralPage(),
+    ),
+    GoRoute(
+      name: deviceDetail,
+      path: deviceDetail,
+      builder: (context, state) {
+        final args = state.extra as Map<String, dynamic>;
+        final device = args['device'] as DeviceEntity;
+        return DeviceDetailPage(device: device);
+      },
     ),
   ];
 }

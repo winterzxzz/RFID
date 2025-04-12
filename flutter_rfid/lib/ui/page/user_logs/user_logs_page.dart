@@ -118,12 +118,12 @@ class Page extends StatelessWidget {
                                         TableCell(
                                             child: Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text('ID/Username'),
+                                          child: Text('ID | Tên'),
                                         )),
                                         TableCell(
                                             child: Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text('Serial Number'),
+                                          child: Text('MÃ SINH VIÊN'),
                                         )),
                                         TableCell(
                                             child: Padding(
@@ -133,22 +133,22 @@ class Page extends StatelessWidget {
                                         TableCell(
                                             child: Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text('Department'),
+                                          child: Text('PHÒNG'),
                                         )),
                                         TableCell(
                                             child: Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text('Date'),
+                                          child: Text('NGÀY'),
                                         )),
                                         TableCell(
                                             child: Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text('Time in'),
+                                          child: Text('GIỜ VÀO'),
                                         )),
                                         TableCell(
                                             child: Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text('Time out'),
+                                          child: Text('GIỜ RA'),
                                         )),
                                       ],
                                     ),
