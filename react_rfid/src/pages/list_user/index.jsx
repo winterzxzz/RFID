@@ -177,6 +177,7 @@ const UserList = () => {
                             <th className="p-3 text-left font-semibold">ID | TÊN</th>
                             <th className="p-3 text-left font-semibold">MÃ SINH VIÊN</th>
                             <th className="p-3 text-left font-semibold">GIỚI TÍNH</th>
+                            <th className="p-3 text-left font-semibold">EMAIL</th>
                             <th className="p-3 text-left font-semibold">CARD UID</th>
                             <th className="p-3 text-left font-semibold">NGÀY ĐĂNG KÝ</th>
                             <th className="p-3 text-left font-semibold">THAO TÁC</th>
@@ -195,6 +196,7 @@ const UserList = () => {
                                 <td>{user.id} | {user.username}</td>
                                 <td>{user.serialnumber}</td>
                                 <td>{user.gender}</td>
+                                <td>{user.email}</td>
                                 <td>{user.card_uid}</td>
                                 <td>{new Date(user.user_date).toLocaleDateString()}</td>
                                 <td>

@@ -84,9 +84,9 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(30) NOT NULL DEFAULT 'None',
-  `serialnumber` varchar(30) NOT NULL DEFAULT 'None',
+  `serialnumber` varchar(30) UNIQUE,
   `gender` varchar(10) NOT NULL DEFAULT 'None',
-  `email` varchar(50) NOT NULL DEFAULT 'None',
+  `email` varchar(50) UNIQUE,
   `card_uid` varchar(30) NOT NULL,
   `card_select` tinyint(1) NOT NULL DEFAULT 0,
   `user_date` date NOT NULL,
@@ -97,17 +97,17 @@ CREATE TABLE `users` (
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `gender`, `email`, `card_uid`, `card_select`, `user_date`, `add_card`) VALUES
-(2, 'Nguyen Van A', 'Male', 'vdlaptrinh@gmail.com', '911277', 0, '2021-06-21', 1),
-(4, 'Nguyen Van B', 'Female', 'vdlaptrinh@gmail.com', '4448724', 0, '2021-06-21', 1),
-(15, 'Nguyen Van C', 'Male', 'vdlaptrinh@gmail.com', '12715413', 0, '2021-06-22', 1),
-(17, 'Nguyen Van D', 'Male', 'vdlaptrinh@gmail.com', '8198525', 0, '2021-06-22', 1),
-(18, 'Nguyen Van E', 'Female', 'vdlaptrinh@gmail.com', '12715501', 1, '2021-06-22', 1),
-(30, 'Tran Van C',  'Male', 'vdlaptrinh@gmail.com', '2243724', 0, '2021-06-22', 1),
-(31, 'Tran Van A',  'Female', 'vdlaptrinh@gmail.com', '15198951', 0, '2021-06-23', 1),
-(32, 'Tran Van B',  'Female', 'vdlaptrinh@gmail.com', '12715493', 0, '2021-06-23', 1),
-(33, 'Tran Van D', 'Female', 'vdlaptrinh@gmail.com', '2249554', 0, '2021-06-23', 1),
-(34, 'Tran Van E', 'Male', 'vdlaptrinh@gmail.com', '15650647', 0, '2021-06-23', 1);
+INSERT INTO `users` (`id`, `username`, `gender`,  `card_uid`, `card_select`, `user_date`, `add_card`) VALUES
+(2, 'Nguyen Van A', 'Male',  '911277', 0, '2021-06-21', 1),
+(4, 'Nguyen Van B', 'Female',  '4448724', 0, '2021-06-21', 1),
+(15, 'Nguyen Van C', 'Male',  '12715413', 0, '2021-06-22', 1),
+(17, 'Nguyen Van D', 'Male',  '8198525', 0, '2021-06-22', 1),
+(18, 'Nguyen Van E', 'Female',  '12715501', 1, '2021-06-22', 1),
+(30, 'Tran Van C',  'Male',  '2243724', 0, '2021-06-22', 1),
+(31, 'Tran Van A',  'Female',  '15198951', 0, '2021-06-23', 1),
+(32, 'Tran Van B',  'Female',  '12715493', 0, '2021-06-23', 1),
+(33, 'Tran Van D', 'Female',  '2249554', 0, '2021-06-23', 1),
+(34, 'Tran Van E', 'Male',  '15650647', 0, '2021-06-23', 1);
 
 -- --------------------------------------------------------
 
