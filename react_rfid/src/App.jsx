@@ -4,6 +4,7 @@ import './App.css'
 import UserList from './pages/list_user';
 import DevicesPage from './pages/devices';
 import Login from './pages/login';
+import DeviceDetailPage from './pages/device_detail';
 import UserLogs from './pages/user_logs';
 import Navigation from './components/common/navigation';
 import { ToastContainer } from 'react-toastify';
@@ -14,8 +15,8 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="container">
-        <header className="flex justify-between items-center p-4">
+      <div className="min-h-screen w-full m-0 p-5 box-border bg-gradient-to-br from-[#1a4f4f] to-[#2d8484] text-white overflow-x-hidden">
+        <header className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">ĐIỂM DANH SINH VIÊN</h1>
           <Navigation />
         </header>
@@ -24,6 +25,7 @@ function App() {
           <Route path="/users" element={<UserList />} />
           <Route path="/users-log" element={<UserLogs />} />
           <Route path="/devices" element={<DevicesPage />} />
+          <Route path="/devices/:id" element={<DeviceDetailPage />} />
           <Route path="/login" element={<Login />} />
         </Routes>
         <ToastContainer />

@@ -145,12 +145,12 @@ const UserList = () => {
     
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="p-4">
             <main>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div className="flex gap-4 mb-2 justify-between items-center">
                     <h2>DANH SÁCH SINH VIÊN</h2>
                     
-                    <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <div className="flex gap-4 justify-end items-center">
                     <Pagination
                         current={pagination.currentPage}
                         pageSize={pagination.limit}
@@ -171,21 +171,22 @@ const UserList = () => {
                     />
                 </div>
                 </div>
-                <table>
+                <table className='w-full'>
                     <thead>
                         <tr>
-                            <th>ID | TÊN</th>
-                            <th>MÃ SINH VIÊN</th>
-                            <th>GIỚI TÍNH</th>
-                            <th>CARD UID</th>
-                            <th>NGÀY ĐĂNG KÝ</th>
-                            <th>THAO TÁC</th>
+                            <th className="p-3 text-left font-semibold">ID | TÊN</th>
+                            <th className="p-3 text-left font-semibold">MÃ SINH VIÊN</th>
+                            <th className="p-3 text-left font-semibold">GIỚI TÍNH</th>
+                            <th className="p-3 text-left font-semibold">CARD UID</th>
+                            <th className="p-3 text-left font-semibold">NGÀY ĐĂNG KÝ</th>
+                            <th className="p-3 text-left font-semibold">THAO TÁC</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map(user => (
                             <tr 
                                 key={user.id}
+                                className="border-b hover:bg-gray-50"
                                 style={{
                                     backgroundColor: user.add_card == 0 ? '#ffebcc' : 'transparent',
                                     color: user.add_card == 0 ? 'black' : 'inherit'

@@ -130,14 +130,17 @@ const UserLogs = () => {
     }
   };
 
-  const handleFilter = async () => {
+  const handleFilter = async (
+    isClearDepartment = false,
+    isClearDateRange = false
+  ) => {
     setLoading(true);
     try {
       let query = `?page=1&limit=${pagination.limit}`;
-      if(dateRange != null) {
+      if(dateRange != null && !isClearDateRange) {
         query += `&date_start=${dateRange[0]}&date_end=${dateRange[1]}`;
       }
-      if(department != null) {
+      if(department != null && !isClearDepartment) {
         query += `&device_dep=${department}`;
       }
 
@@ -177,29 +180,27 @@ const UserLogs = () => {
     return <div className="loading-container">
         <div className="loading-spinner"></div>
     </div>;
-} else {
-    if(logs.length === 0) {
-        return <div>Không có dữ liệu</div>;
-    }
-}
+} 
 
   return (
-    <div className="p-6">
-      <h1 className="text-center text-3xl mb-6">
+    <div className="p-4">
+      <div className="flex gap-4 mb-2 justify-between items-center">
+      <h2>
         LỊCH SỬ ĐIỂM DANH
-      </h1>
+      </h2>
       
       {/* Add filter controls */}
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex gap-4justify-center items-center">
         <DatePicker.RangePicker 
           onChange={(dates) => {
+            console.log(dates);
             setDateRange(dates);
+            if (dates === null) {
+              handleFilter(false, true);
+            }
           }}
           value={dateRange}
           allowClear
-          onClear={() => {
-            setDateRange(null);
-          }}
           placeholder="Chọn ngày"
           style={{ width: '256px', margin: '8px' }}
         />
@@ -209,11 +210,12 @@ const UserLogs = () => {
           placeholder="Chọn phòng ban"
           onChange={(value) => {
             setDepartment(value);
+            console.log(value);
+            if (value === undefined) {
+              handleFilter(true, false);
+            }
           }}
           value={department}
-          onClear={() => {
-            setDepartment(null);
-          }}
           allowClear
           style={{ width: '192px' }}
           options={departments.map(dep => ({ value: dep, label: dep }))}
@@ -235,10 +237,11 @@ const UserLogs = () => {
           XUẤT EXCEL
         </Button>
       </div>
+      </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full bg-white shadow-md rounded">
-          <thead className="bg-sky-100">
+        <table>
+          <thead>
             <tr>
               <th className="p-3 text-left cursor-pointer" onClick={() => handleSort('id')}>
                 ID {sortConfig.key === 'id' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
@@ -268,14 +271,21 @@ const UserLogs = () => {
           </thead>
           <tbody>
             {filteredLogs.map((log) => (
-              <tr key={log.id} className="border-b hover:bg-gray-50">
+              <tr key={log.id} className="border-b">
                 <td className="p-3">{log.id}</td>
                 <td className="p-3">{log.username}</td>
                 <td className="p-3">{log.serialnumber}</td>
                 <td className="p-3">{log.card_uid}</td>
                 <td className="p-3">{log.device_dep}</td>
                 {/* date format */}
-                <td className="p-3">{new Date(log.checkindate).toLocaleDateString()}</td>
+                <td className="p-3">{new Date(log.checkindate).toLocaleDateString(
+                  'vi-VN',
+                  {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                  }
+                )}</td>
                 <td className="p-3">{log.timein}</td>
                 <td className="p-3">{log.timeout}</td>
               </tr>
@@ -300,7 +310,6 @@ const UserLogs = () => {
           }}
           showSizeChanger
           showQuickJumper
-          style={{ color: '#ffffff' }}
         />
       </div>
     </div>

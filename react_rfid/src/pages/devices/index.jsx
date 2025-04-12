@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Space, Button, Modal, Form, Input, Select, Pagination } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { EyeFilled, PlusOutlined } from '@ant-design/icons';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '../../configs/api_client';
 import { toast } from 'react-toastify';
 
 
 const DevicesPage = () => {
+    const navigate = useNavigate();
+
+
     const [devices, setDevices] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -40,6 +44,13 @@ const DevicesPage = () => {
             setIsLoading(false);
         }
     };
+
+    const handleViewDetail = (device) => {
+        navigate(`/devices/${device.id}`, {
+            state: { deviceData: device }
+        });
+    }
+
 
     const handleEdit = (device) => {
         setEditingDevice(device);
@@ -198,6 +209,13 @@ const DevicesPage = () => {
                                 </td>
                                 <td>
                                     <Space>
+                                        <Button
+                                            type="primary"
+                                            icon={<EyeFilled />}
+                                            onClick={() => handleViewDetail(device)}
+                                        >
+                                            Xem chi tiết
+                                        </Button>
                                         <Button
                                             type="primary"
                                             icon={<EditOutlined />}
