@@ -1,0 +1,2 @@
+/Users/winterphan/Documents/Web/RFID/flutter_rfid/android/app/.cxx/Debug/5a3h21t3/x86/CMakeFiles/edit_cache.dir
+/Users/winterphan/Documents/Web/RFID/flutter_rfid/android/app/.cxx/Debug/5a3h21t3/x86/CMakeFiles/rebuild_cache.dir

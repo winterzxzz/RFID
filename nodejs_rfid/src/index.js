@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -48,7 +48,7 @@ const io = new Server(server, {
 app.use(cors({
     origin: 'http://localhost:5173  ',  // Your frontend URL
     credentials: true
-  }));
+}));
 
 
 io.on('connection', (socket) => {
@@ -210,7 +210,7 @@ app.get('/users', verifyToken, (req, res) => {
 
         const query = `SELECT * FROM users ${whereClause} ORDER BY id ${direction} LIMIT ? OFFSET ?`;
         const queryParams = searchParam ? [searchParam, limit, offset] : [limit, offset];
-        
+
         db.query(query, queryParams, (err, result) => {
             if (err) {
                 return res.status(500).json({
@@ -245,7 +245,7 @@ app.get('/users', verifyToken, (req, res) => {
                 });
             });
 
-            
+
         });
     });
 });
@@ -254,29 +254,12 @@ app.get('/users', verifyToken, (req, res) => {
 // update user
 app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
-    const { username, serialnumber, gender, email, device_uid } = req.body;
-
-    if (!device_uid) {
-        return res.status(400).json({
-            status_code: 400,
-            message: 'Device is required',
-        });
-    }
-
-    db.query('SELECT * FROM devices WHERE device_uid = ?', [device_uid], (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                status_code: 500,
-                message: err.message
-            });
-        }
-
-        const { device_dep } = result[0];
-
-        const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, device_dep = ?, device_uid = ?, add_card = ? WHERE id = ?';
+    const { username, serialnumber, gender, email } = req.body;
+    // add add_card is 1
+    const query = 'UPDATE users SET username = ?, serialnumber = ?, gender = ?, email = ?, add_card = 1 WHERE id = ?';
 
 
-        db.query(query, [username, serialnumber, gender, email, device_dep, device_uid, 1, userId], (err, result) => {
+    db.query(query, [username, serialnumber, gender, email, userId], (err, result) => {
         if (err) {
             console.log(err);
             return res.status(500).json({
@@ -292,19 +275,18 @@ app.put('/users/:id', (req, res) => {
         }
         res.status(200).json({
             status_code: 200,
-            message: 'Cập nhật người dùng thành công', 
+            message: 'Cập nhật người dùng thành công',
         });
     });
-    });
 
-    
+
 });
 
 // delete user
 app.delete('/users/:id', verifyToken, (req, res) => {
     const userId = req.params.id;
     const query = 'DELETE FROM users WHERE id = ?';
-    
+
     db.query(query, [userId], (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -356,7 +338,7 @@ app.get('/devices', verifyToken, (req, res) => {
         // Then get paginated data with search and sorting
         const query = `SELECT * FROM devices ${whereClause} ORDER BY id ${direction} LIMIT ? OFFSET ?`;
         const queryParams = searchParam ? [searchParam, limit, offset] : [limit, offset];
-        
+
         db.query(query, queryParams, (err, result) => {
             if (err) {
                 return res.status(500).json({
@@ -373,7 +355,7 @@ app.get('/devices', verifyToken, (req, res) => {
                         totalPages,
                         currentPage: page,
                         limit
-                    }, 
+                    },
                     items: result
                 },
             });
@@ -387,7 +369,7 @@ app.post('/devices', verifyToken, (req, res) => {
     const { device_name, device_dep } = req.body;
     const device_uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const query = 'INSERT INTO devices (device_name, device_dep, device_uid, device_date) VALUES (?, ?, ?, CURDATE())';
-    
+
     db.query(query, [device_name, device_dep, device_uid], (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -422,7 +404,7 @@ app.put('/devices/:id', verifyToken, (req, res) => {
     const { device_name, device_dep, device_mode } = req.body;
     console.log(req.body);
     const query = 'UPDATE devices SET device_name = ?, device_dep = ?, device_mode = ? WHERE id = ?';
-    
+
     db.query(query, [device_name, device_dep, device_mode, deviceId], (err, result) => {
         if (err) {
             console.log(err);
@@ -449,7 +431,7 @@ app.put('/devices/:id', verifyToken, (req, res) => {
 app.delete('/devices/:id', verifyToken, (req, res) => {
     const deviceId = req.params.id;
     const query = 'DELETE FROM devices WHERE id = ?';
-    
+
     db.query(query, [deviceId], (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -488,16 +470,16 @@ app.get('/users-log', verifyToken, (req, res) => {
 
     // Only add date conditions if dates are provided
     if (date_start && date_end) {
-        whereClause += ' AND DATE(checkindate) BETWEEN ? AND ?';
+        whereClause += ' AND DATE(ul.checkindate) BETWEEN ? AND ?';
         queryParams.push(date_start, date_end);
     }
 
     if (device_dep) {
-        whereClause += ' AND device_dep = ?';
+        whereClause += ' AND d.device_dep = ?';
         queryParams.push(device_dep);
     }
 
-    const countQuery = `SELECT COUNT(*) as total FROM users_logs WHERE ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as total FROM users_logs ul JOIN devices d ON ul.device_id = d.id WHERE ${whereClause}`;
     db.query(countQuery, queryParams, (err, countResult) => {
         if (err) {
             return res.status(500).json({
@@ -509,9 +491,16 @@ app.get('/users-log', verifyToken, (req, res) => {
         const total = countResult[0].total;
         const totalPages = Math.ceil(total / limit);
 
-        const query = `SELECT * FROM users_logs WHERE ${whereClause} ORDER BY id ${direction} LIMIT ? OFFSET ?`;
+        const query = `
+            SELECT ul.*, d.device_dep, d.device_name 
+            FROM users_logs ul
+            JOIN devices d ON ul.device_id = d.id
+            WHERE ${whereClause} 
+            ORDER BY ul.id ${direction} 
+            LIMIT ? OFFSET ?
+        `;
         queryParams.push(limit, offset);
-        
+
         db.query(query, queryParams, (err, result) => {
             if (err) {
                 return res.status(500).json({
@@ -546,9 +535,9 @@ function convertVietnameseNameToEnglish(vietnameseName) {
 
 // add user log
 app.post('/users-log', async (req, res) => {
-    const { card_uid, device_uid } = req.query;
-    
-    if (!card_uid || !device_uid) {
+    const { card_uid, device_id } = req.query;
+
+    if (!card_uid || !device_id) {
         return res.status(400).json({
             status_code: 400,
             message: 'Missing parameters',
@@ -557,9 +546,9 @@ app.post('/users-log', async (req, res) => {
 
     try {
         // Check device - Convert to promise-based query
-        const [devices] = await db.promise().query('SELECT * FROM devices WHERE device_uid = ?', [device_uid]);
+        const [devices] = await db.promise().query('SELECT * FROM devices WHERE id = ?', [device_id]);
         const device = devices[0];
-        
+
         if (!device) {
             return res.status(400).json({
                 status_code: 400,
@@ -568,7 +557,6 @@ app.post('/users-log', async (req, res) => {
         }
 
         const device_mode = device.device_mode;
-        const device_dep = device.device_dep;
 
         // Device mode 1 - Login/Logout mode
         if (device_mode === 1) {
@@ -589,7 +577,11 @@ app.post('/users-log', async (req, res) => {
                 });
             }
 
-            if (user.device_uid !== device_uid && user.device_uid !== 0) {
+            // check device include list devices of user in table user_devices
+            const [userDevices] = await db.promise().query('SELECT * FROM user_devices WHERE user_id = ? AND device_id = ?', [user.id, device.id]);
+            const userDevice = userDevices[0];
+
+            if (!userDevice) {
                 return res.status(400).json({
                     status_code: 400,
                     message: 'Not allowed!',
@@ -601,8 +593,8 @@ app.post('/users-log', async (req, res) => {
 
             // Check if user has an incomplete log (no timeout) for today
             const [logs] = await db.promise().query(
-                'SELECT * FROM users_logs WHERE card_uid = ? AND checkindate = ? AND timeout = "00:00:00" ORDER BY id DESC LIMIT 1',
-                [card_uid, currentDate]
+                'SELECT * FROM users_logs WHERE device_id = ? AND card_uid = ? AND checkindate = ? AND timeout = "00:00:00" ORDER BY id DESC LIMIT 1',
+                [device.id, card_uid, currentDate]
             );
             const incompleteLog = logs[0];
 
@@ -610,8 +602,8 @@ app.post('/users-log', async (req, res) => {
             if (!incompleteLog) {
                 // Create new check-in entry
                 const [result] = await db.promise().query(
-                    'INSERT INTO users_logs (username, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                    [user.username, user.serialnumber, card_uid, device_uid, device_dep, currentDate, currentTime, '00:00:00']
+                    'INSERT INTO users_logs (username, serialnumber, card_uid, device_id, checkindate, timein, timeout) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [user.username, user.serialnumber, card_uid, device.id, currentDate, currentTime, '00:00:00']
                 );
 
 
@@ -619,22 +611,28 @@ app.post('/users-log', async (req, res) => {
                 const newLog = newLogs[0];
 
 
-                
                 io.emit('attendance', {
                     status_code: 200,
                     message: 'CHECK IN ' + user.username,
-                    data: newLog
+                    data: {
+                        ...newLog, 
+                        device_dep: device.device_dep
+                    }
                 });
                 return res.status(200).json({
                     status_code: 200,
                     message: 'CHECK IN ' + convertVietnameseNameToEnglish(user.username),
-                    data: newLog
+                    data: {
+                        ...newLog,
+                        device_dep: device.device_dep
+                    }
                 });
             } else {
+                
                 // Complete the existing check-in with a timeout
                 await db.promise().query(
-                    'UPDATE users_logs SET timeout = ? WHERE id = ?',
-                    [currentTime, incompleteLog.id]
+                    'UPDATE users_logs SET timeout = ? WHERE id = ? AND device_id = ?',
+                    [currentTime, incompleteLog.id, device.id]
                 );
 
                 const [newLogs] = await db.promise().query('SELECT * FROM users_logs WHERE id = ?', [incompleteLog.id]);
@@ -643,51 +641,86 @@ app.post('/users-log', async (req, res) => {
                 io.emit('attendance', {
                     status_code: 200,
                     message: 'CHECK OUT ' + user.username,
-                    data: newLog
+                    data: {
+                        ...newLog,
+                        device_dep: device.device_dep
+                    }
                 });
                 return res.status(200).json({
                     status_code: 200,
                     // convert user.name to from vietnamese to english
                     message: 'CHECK OUT ' + convertVietnameseNameToEnglish(user.username),
-                    data: newLog
+                    data: {
+                        ...newLog,
+                        device_dep: device.device_dep
+                    }
                 });
             }
         }
         // Device mode 0 - Card registration mode
         else if (device_mode === 0) {
-            const [cards] = await db.promise().query('SELECT * FROM users WHERE card_uid = ?', [card_uid]);
-            const existingCard = cards[0];
+            const [users] = await db.promise().query('SELECT * FROM users WHERE card_uid = ?', [card_uid]);
+            const user = users[0];
+            var userId;
+            if (!user) {
+                // create new user
+                var currentDate = moment().format('YYYY-MM-DD');
+                const [result] = await db.promise().query(
+                    'INSERT INTO users (card_uid, card_select, user_date) VALUES (?, 1, ?)',
+                    [card_uid, currentDate]
+                );
 
-            if (existingCard) {
-                await db.promise().query('UPDATE users SET card_select = 0');
-                await db.promise().query('UPDATE users SET card_select = 1 WHERE card_uid = ?', [card_uid]);
+                // Check result.insertId instead
+                if (!result.insertId) {
+                    return res.status(400).json({
+                        status_code: 400,
+                        message: `Card ${card_uid} registration failed`,
+                    });
+                }
+
+                userId = result.insertId;
+            } else {
+                userId = user.id;
+            }
+
+            // check user include list users of device
+            const [userDevices] = await db.promise().query('SELECT * FROM user_devices WHERE user_id = ? AND device_id = ?', [userId, device.id]);
+            const userDevice = userDevices[0];
+
+            if (userDevice) {
                 return res.status(400).json({
                     status_code: 400,
                     message: 'Card ' + card_uid + ' already registered',
                 });
             } else {
-                await db.promise().query('UPDATE users SET card_select = 0');
-                // First insert the new user
-                const [result] = await db.promise().query(
-                    'INSERT INTO users (card_uid, card_select, device_uid, device_dep, user_date) VALUES (?, 1, ?, ?, CURDATE())',
-                    [card_uid, device_uid, device_dep]
+                // create new user_device
+                var currentDate = moment().format('YYYY-MM-DD');
+                const [result2] = await db.promise().query(
+                    'INSERT INTO user_devices (user_id, device_id, add_card, card_select, card_uid, add_date) VALUES (?, ?, 1, 1, ?, ?)',
+                    [userId, device.id, card_uid, currentDate]
                 );
-                // Then fetch the newly created user
-                const [newUsers] = await db.promise().query(
-                    'SELECT * FROM users WHERE id = ?',
-                    [result.insertId]
-                );
-                const newUser = newUsers[0];
-                console.log(newUser);
+
+
+
+                if (!result2.insertId) {
+                    return res.status(400).json({
+                        status_code: 400,
+                        message: 'Card ' + card_uid + ' registration failed',
+                    });
+                }
+
+                // fetch user
+                const [users2] = await db.promise().query('SELECT * FROM users WHERE id = ?', [userId]);
+                const user2 = users2[0];
                 io.emit('add-card', {
                     status_code: 200,
                     message: 'Register card ' + card_uid + ' success',
-                    data: newUser
+                    data: user2
                 });
                 return res.status(200).json({
                     status_code: 200,
                     message: 'Register card ' + card_uid + ' success',
-                    data: newUser
+                    data: user2
                 });
             }
         }
@@ -699,4 +732,3 @@ app.post('/users-log', async (req, res) => {
         });
     }
 });
-

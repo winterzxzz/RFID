@@ -4,7 +4,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import apiClient from '../../configs/api_client';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
 const UserList = () => {
@@ -82,7 +81,6 @@ const UserList = () => {
                     serialnumber: values.serialnumber,
                     gender: values.gender,
                     email: values.email,
-                    device_uid: values.device_uid
                 });
                 if (response.data.status_code === 200) {
                     toast.success('Sửa thông tin sinh viên thành công');
@@ -181,7 +179,6 @@ const UserList = () => {
                             <th>GIỚI TÍNH</th>
                             <th>CARD UID</th>
                             <th>NGÀY ĐĂNG KÝ</th>
-                            <th>THIẾT BỊ</th>
                             <th>THAO TÁC</th>
                         </tr>
                     </thead>
@@ -199,7 +196,6 @@ const UserList = () => {
                                 <td>{user.gender}</td>
                                 <td>{user.card_uid}</td>
                                 <td>{new Date(user.user_date).toLocaleDateString()}</td>
-                                <td>{user.device_dep}</td>
                                 <td>
                                     <Space>
                                         <Button
@@ -266,20 +262,6 @@ const UserList = () => {
                         rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
                     >
                         <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="device_uid"
-                        label="Thiết bị"
-                        initialValue={editingUser ? editingUser.device_uid : null}
-                        rules={[{ required: true, message: 'Vui lòng chọn thiết bị!' }]}
-                    >
-                        <Select
-                            placeholder="Chọn thiết bị"
-                        >
-                            {departments.map(department => (
-                                <Select.Option value={department.device_uid}>{department.device_dep}</Select.Option>
-                            ))}
-                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>

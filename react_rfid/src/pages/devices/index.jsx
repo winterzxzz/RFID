@@ -165,7 +165,7 @@ const DevicesPage = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>TÊN THIẾT BỊ</th>
+                            <th>ID | TÊN THIẾT BỊ</th>
                             <th>PHÒNG</th>
                             <th>MÃ THIẾT BỊ</th>
                             <th>NGÀY CẬP NHẬT</th>
@@ -176,7 +176,7 @@ const DevicesPage = () => {
                     <tbody>
                         {devices.map(device => (
                             <tr key={device.id}>
-                                <td>{device.device_name}</td>
+                                <td>{device.id} | {device.device_name}</td>
                                 <td>{device.device_dep}</td>
                                 <td>{device.device_uid}</td>
                                 <td>{new Date(device.device_date).toLocaleDateString()}</td>
