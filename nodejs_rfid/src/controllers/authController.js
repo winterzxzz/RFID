@@ -4,7 +4,7 @@ const db = require('../config/db');
 const env = require('../config/env');
 
 // login admin
-const login = (req, res) => {
+const login = async (req, res) => {
     const { admin_email, admin_pwd } = req.body;
     if (!admin_email || !admin_pwd) {
         return res.status(400).json({
@@ -16,7 +16,7 @@ const login = (req, res) => {
 
     const query = 'SELECT * FROM admin WHERE admin_email = ?';
 
-    db.query(query, [admin_email], (err, result) => {
+    db.query(query, [admin_email], async (err, result) => {
         if (err) {
             return res.status(500).json({
                 status_code: 500,
@@ -33,8 +33,7 @@ const login = (req, res) => {
 
         // Create JWT token
         const admin = result[0];
-        let passwordHash = bcrypt.hashSync(admin_pwd, 10);
-        let isMatch = bcrypt.compareSync(admin.admin_pwd, passwordHash);
+        let isMatch = bcrypt.compareSync(admin_pwd, admin.admin_pwd);
         if (!isMatch) {
             return res.status(401).json({
                 status_code: 401,
