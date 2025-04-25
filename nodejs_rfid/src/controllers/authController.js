@@ -34,7 +34,7 @@ const login = (req, res) => {
         // Create JWT token
         const admin = result[0];
         let passwordHash = bcrypt.hashSync(admin_pwd, 10);
-        let isMatch = bcrypt.compareSync(admin_pwd, passwordHash);
+        let isMatch = bcrypt.compareSync(admin.admin_pwd, passwordHash);
         if (!isMatch) {
             return res.status(401).json({
                 status_code: 401,

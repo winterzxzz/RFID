@@ -58,27 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
             controller: emailController,
           ),
           const SizedBox(height: 16),
-          CustomTextField(
-            label: 'Password',
-            hintText: 'Enter your password',
-            controller: passwordController,
-          ),
-          const SizedBox(height: 16),
           const Divider(),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {},
-              child: const Text('Save'),
-            ),
-          ),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,

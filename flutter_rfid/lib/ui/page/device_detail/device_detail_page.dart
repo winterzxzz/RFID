@@ -47,7 +47,7 @@ class Page extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              title: Text(device.deviceName ?? 'Manager Users'),
+              title: Text(device.deviceDep ?? 'Manager Users'),
               floating: true,
               snap: true,
               actions: [
