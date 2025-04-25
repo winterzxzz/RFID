@@ -47,7 +47,7 @@ class Page extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              title: const Text('Manage Users'),
+              title: Text(device.deviceName ?? 'Manager Users'),
               floating: true,
               snap: true,
               actions: [
@@ -74,11 +74,7 @@ class Page extends StatelessWidget {
                       state.exportStatus == LoadStatus.failure) {
                     showToast(
                         title: state.message, type: ToastificationType.error);
-                  } else if (state.loadStatus == LoadStatus.success ||
-                      state.exportStatus == LoadStatus.success) {
-                    showToast(
-                        title: state.message, type: ToastificationType.success);
-                  }
+                  } 
                 }
               },
               builder: (context, state) {
