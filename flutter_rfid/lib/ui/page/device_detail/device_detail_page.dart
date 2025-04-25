@@ -320,11 +320,13 @@ class Page extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    device.deviceUid ?? "N/A",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      device.deviceUid ?? "N/A",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

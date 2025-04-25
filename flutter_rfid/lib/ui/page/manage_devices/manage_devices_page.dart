@@ -7,10 +7,8 @@ import 'package:flutter_rfid/data/models/entities/device_entity.dart';
 import 'package:flutter_rfid/data/models/enums/load_status.dart';
 import 'package:flutter_rfid/ui/common/widgets/build_pagination_number.dart';
 import 'package:flutter_rfid/ui/common/widgets/confirm_dia_log.dart';
-import 'package:flutter_rfid/ui/common/widgets/custom_modal_bottom_sheet.dart';
 import 'package:flutter_rfid/ui/page/manage_devices/manage_devices_cubit.dart';
 import 'package:flutter_rfid/ui/page/manage_devices/manage_devices_state.dart';
-import 'package:flutter_rfid/ui/page/manage_devices/widgets/form_update_device.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -376,21 +374,29 @@ class Page extends StatelessWidget {
   }
 
   void _onAdd(BuildContext context) {
-    showCustomModalBottomSheet(
-        context,
-        BlocProvider.value(
-          value: context.read<ManageDevicesCubit>(),
-          child: const FormUpdateDevice(device: null),
-        ));
+    // showCustomModalBottomSheet(
+    //     context,
+    //     BlocProvider.value(
+    //       value: context.read<ManageDevicesCubit>(),
+    //       child: const FormUpdateDevice(device: null),
+    //     ));
+    GoRouter.of(context).pushNamed(AppRouter.updateDevice, extra: {
+      'device': null,
+      'cubit': context.read<ManageDevicesCubit>(),
+    });
   }
 
   void _onEdit(BuildContext context, DeviceEntity device) {
-    showCustomModalBottomSheet(
-        context,
-        BlocProvider.value(
-          value: context.read<ManageDevicesCubit>(),
-          child: FormUpdateDevice(device: device),
-        ));
+    // showCustomModalBottomSheet(
+    //     context,
+    //     BlocProvider.value(
+    //       value: context.read<ManageDevicesCubit>(),
+    //       child: FormUpdateDevice(device: device),
+    //     ));
+    GoRouter.of(context).pushNamed(AppRouter.updateDevice, extra: {
+      'device': device,
+      'cubit': context.read<ManageDevicesCubit>(),
+    });
   }
 
   void _onViewDetail(BuildContext context, DeviceEntity device) {

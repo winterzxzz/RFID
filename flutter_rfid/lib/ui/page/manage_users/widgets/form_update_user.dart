@@ -46,108 +46,93 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.7,
-      maxChildSize: 0.9,
-      expand: false,
-      builder: (_, scrollController) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: SingleChildScrollView(
-            controller: scrollController,
-            child: Form(
-              key: formKey,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CustomTextField(
-                      controller: usernameController,
-                      label: 'Username',
-                      hintText: 'Enter your username',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter username';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextField(
-                      controller: serialNumberController,
-                      label: 'Serial Number',
-                      hintText: 'Enter your serial number',
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextField(
-                      controller: emailController,
-                      label: 'Email',
-                      hintText: 'Enter your email',
-                    ),
-                    const SizedBox(height: 24),
-                    DropdownButtonFormField<String>(
-                      value: selectedGender,
-                      decoration: const InputDecoration(
-                        labelText: 'Gender',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: ['Male', 'Female'].map((String gender) {
-                        return DropdownMenuItem<String>(
-                          value: gender,
-                          child: Text(gender),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          selectedGender = newValue;
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: 120,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (formKey.currentState?.validate() ?? false) {
-                                context
-                                    .read<ManageUsersCubit>()
-                                    .updateUser(
-                                      id: widget.user.id!,
-                                      username: usernameController.text,
-                                      serialnumber: serialNumberController.text,
-                                      gender: selectedGender ?? '',
-                                      email: emailController.text,
-                                    )
-                                    .then((value) {
-                                  if (context.mounted) {
-                                    GoRouter.of(context).pop();
-                                  }
-                                });
-                              }
-                            },
-                            child: const Text('Save'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Update User'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextField(
+                  controller: usernameController,
+                  label: 'Username',
+                  hintText: 'Enter your username',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter username';
+                    }
+                    return null;
+                  },
                 ),
-              ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  controller: serialNumberController,
+                  label: 'Serial Number',
+                  hintText: 'Enter your serial number',
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  controller: emailController,
+                  label: 'Email',
+                  hintText: 'Enter your email',
+                ),
+                const SizedBox(height: 24),
+                DropdownButtonFormField<String>(
+                  value: selectedGender,
+                  decoration: const InputDecoration(
+                    labelText: 'Gender',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['Male', 'Female'].map((String gender) {
+                    return DropdownMenuItem<String>(
+                      value: gender,
+                      child: Text(gender),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        selectedGender = newValue;
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState?.validate() ?? false) {
+                        context
+                            .read<ManageUsersCubit>()
+                            .updateUser(
+                              id: widget.user.id!,
+                              username: usernameController.text,
+                              serialnumber: serialNumberController.text,
+                              gender: selectedGender ?? '',
+                              email: emailController.text,
+                            )
+                            .then((value) {
+                          if (context.mounted) {
+                            GoRouter.of(context).pop();
+                          }
+                        });
+                      }
+                    },
+                    child: const Text('Save'),
+                  ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

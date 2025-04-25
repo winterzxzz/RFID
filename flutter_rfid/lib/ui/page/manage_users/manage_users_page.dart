@@ -2,15 +2,15 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rfid/app.dart';
+import 'package:flutter_rfid/common/router/route_config.dart';
 import 'package:flutter_rfid/data/models/entities/manage_user_entity.dart';
 import 'package:flutter_rfid/data/models/enums/load_status.dart';
 import 'package:flutter_rfid/ui/common/widgets/build_pagination_number.dart';
 import 'package:flutter_rfid/ui/common/widgets/confirm_dia_log.dart';
-import 'package:flutter_rfid/ui/common/widgets/custom_modal_bottom_sheet.dart';
 import 'package:flutter_rfid/ui/page/manage_users/manage_users_cubit.dart';
 import 'package:flutter_rfid/ui/page/manage_users/manage_users_state.dart';
-import 'package:flutter_rfid/ui/page/manage_users/widgets/form_update_user.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class ManageUsersPage extends StatelessWidget {
@@ -269,11 +269,9 @@ class Page extends StatelessWidget {
   }
 
   void _onEdit(BuildContext context, ManageUserEntity user) {
-    showCustomModalBottomSheet(
-        context,
-        BlocProvider.value(
-          value: context.read<ManageUsersCubit>(),
-          child: FormUpdateUser(user: user),
-        ));
+    GoRouter.of(context).pushNamed(AppRouter.updateUser, extra: {
+      'user': user,
+      'cubit': context.read<ManageUsersCubit>(),
+    });
   }
 }
