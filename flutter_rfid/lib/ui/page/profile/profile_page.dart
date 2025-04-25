@@ -48,11 +48,13 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16),
         children: [
           CustomTextField(
+              isEnabled: false,
               label: 'Name',
               hintText: 'Enter your name',
               controller: nameController),
           const SizedBox(height: 16),
           CustomTextField(
+            isEnabled: false,
             label: 'Email',
             hintText: 'Enter your email',
             controller: emailController,
