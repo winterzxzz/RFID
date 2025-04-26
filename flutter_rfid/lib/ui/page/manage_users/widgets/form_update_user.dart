@@ -48,7 +48,7 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update User'),
+        title: const Text('Cập nhật thông tin'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -60,11 +60,11 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
               children: [
                 CustomTextField(
                   controller: usernameController,
-                  label: 'Username',
-                  hintText: 'Enter your username',
+                  label: 'Tên tài khoản',
+                  hintText: 'Nhập tên tài khoản',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter username';
+                      return 'Vui lòng nhập tên tài khoản';
                     }
                     return null;
                   },
@@ -72,20 +72,20 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
                 const SizedBox(height: 16),
                 CustomTextField(
                   controller: serialNumberController,
-                  label: 'Serial Number',
-                  hintText: 'Enter your serial number',
+                  label: 'Mã sinh viên',
+                  hintText: 'Nhập mã sinh viên',
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
                   controller: emailController,
                   label: 'Email',
-                  hintText: 'Enter your email',
+                  hintText: 'Nhập email',
                 ),
                 const SizedBox(height: 24),
                 DropdownButtonFormField<String>(
                   value: selectedGender,
                   decoration: const InputDecoration(
-                    labelText: 'Gender',
+                    labelText: 'Giới tính',
                     border: OutlineInputBorder(),
                   ),
                   items: ['Male', 'Female'].map((String gender) {
@@ -125,7 +125,7 @@ class _FormUpdateUserState extends State<FormUpdateUser> {
                         });
                       }
                     },
-                    child: const Text('Save'),
+                    child: const Text('Lưu'),
                   ),
                 ),
               ],

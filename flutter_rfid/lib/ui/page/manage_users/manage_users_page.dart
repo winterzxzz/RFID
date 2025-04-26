@@ -42,7 +42,7 @@ class Page extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             const SliverAppBar(
-              title: Text('Manage Users'),
+              title: Text('DANH SÁCH SINH VIÊN'),
               floating: true,
               snap: true,
             ),
@@ -55,7 +55,7 @@ class Page extends StatelessWidget {
                 } else if (state.loadStatus == LoadStatus.success) {
                   if (state.users.isEmpty) {
                     return const SliverFillRemaining(
-                      child: Center(child: Text('No users found')),
+                      child: Center(child: Text('Không có dữ liệu')),
                     );
                   } else {
                     return SliverToBoxAdapter(

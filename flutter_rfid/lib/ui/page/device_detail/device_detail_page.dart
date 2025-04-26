@@ -47,7 +47,7 @@ class Page extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              title: Text(device.deviceDep ?? 'Manager Users'),
+              title: Text(device.deviceDep ?? 'Quản lý tài khoản'),
               floating: true,
               snap: true,
               actions: [
@@ -81,7 +81,7 @@ class Page extends StatelessWidget {
                 if (state.loadStatus == LoadStatus.success) {
                   if (state.deviceDetail.isEmpty) {
                     return const SliverFillRemaining(
-                      child: Center(child: Text('No device detail found')),
+                      child: Center(child: Text('Không có dữ liệu')),
                     );
                   } else {
                     return SliverToBoxAdapter(
@@ -306,27 +306,6 @@ class Page extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Icon(Icons.devices, color: Color(0xFFD4AF37)),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Mã thiết bị:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      device.deviceUid ?? "N/A",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
                     ),
                   ),
                 ],

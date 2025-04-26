@@ -44,11 +44,11 @@ class Page extends StatelessWidget {
           navigator.hideLoadingOverlay();
           if (state.exportStatus == LoadStatus.success) {
             showToast(
-                title: 'Exported to Excel successfully',
+                title: 'Xuất file Excel thành công',
                 type: ToastificationType.success);
           } else if (state.exportStatus == LoadStatus.failure) {
             showToast(
-                title: 'Failed to export', type: ToastificationType.error);
+                title: 'Lỗi khi xuất file Excel', type: ToastificationType.error);
           }
         }
       },
@@ -62,7 +62,7 @@ class Page extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverAppBar(
-                title: const Text('User Logs'),
+                title: const Text('LỊCH SỬ ĐIỂM DANH'),
                 floating: true,
                 snap: true,
                 actions: [
@@ -87,7 +87,7 @@ class Page extends StatelessWidget {
                   } else if (state.loadStatus == LoadStatus.success) {
                     if (state.users.isEmpty) {
                       return const SliverFillRemaining(
-                        child: Center(child: Text('No user logs found')),
+                        child: Center(child: Text('Không có dữ liệu')),
                       );
                     } else {
                       return SliverToBoxAdapter(

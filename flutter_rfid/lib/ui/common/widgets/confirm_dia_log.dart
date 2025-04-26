@@ -11,13 +11,13 @@ void showConfirmDialog(
             actions: [
               TextButton(
                   onPressed: () => GoRouter.of(context).pop(),
-                  child: const Text('Cancel')),
+                  child: const Text('Hủy bỏ')),
               ElevatedButton(
                   onPressed: () {
                     GoRouter.of(context).pop();
                     onConfirm();
                   },
-                  child: const Text('Confirm')),
+                  child: const Text('Xác nhận')),
             ],
           ));
 }

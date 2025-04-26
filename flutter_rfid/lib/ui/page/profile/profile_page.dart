@@ -42,21 +42,21 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Cá nhân'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           CustomTextField(
               isEnabled: false,
-              label: 'Name',
-              hintText: 'Enter your name',
+              label: 'Tên',
+              hintText: 'Nhập tên',
               controller: nameController),
           const SizedBox(height: 16),
           CustomTextField(
             isEnabled: false,
             label: 'Email',
-            hintText: 'Enter your email',
+            hintText: 'Nhập email',
             controller: emailController,
           ),
           const SizedBox(height: 16),
@@ -74,8 +74,8 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 showConfirmDialog(
                   context,
-                  'Logout',
-                  'Are you sure you want to logout?',
+                  'Đăng xuất',
+                  'Bạn có chắc chắn muốn đăng xuất?',
                   () {
                     injector<UserCubit>().clearUser().then((_) {
                       if (context.mounted) {
@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 );
               },
-              child: const Text('Logout'),
+              child: const Text('ĐĂNG XUẤT'),
             ),
           ),
         ],

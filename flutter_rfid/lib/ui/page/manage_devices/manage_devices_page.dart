@@ -42,7 +42,7 @@ class Page extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              title: const Text('Manage Devices'),
+              title: const Text('QUẢN LÝ THIẾT BỊ'),
               floating: true,
               snap: true,
               actions: [
@@ -61,7 +61,7 @@ class Page extends StatelessWidget {
                 } else if (state.loadStatus == LoadStatus.success) {
                   if (state.devices.isEmpty) {
                     return const SliverFillRemaining(
-                      child: Center(child: Text('No users found')),
+                      child: Center(child: Text('Không có dữ liệu')),
                     );
                   } else {
                     return SliverToBoxAdapter(
@@ -76,10 +76,10 @@ class Page extends StatelessWidget {
                                 columnWidths: const {
                                   0: FixedColumnWidth(100), // Device Name
                                   1: FixedColumnWidth(100), // Room
-                                  2: FixedColumnWidth(150), // Device UID
-                                  3: FixedColumnWidth(100), // Date
-                                  4: FixedColumnWidth(250), // Status
-                                  5: FixedColumnWidth(200), // Actions
+                                  // 2: FixedColumnWidth(150), // Device UID
+                                  2: FixedColumnWidth(100), // Date
+                                  3: FixedColumnWidth(250), // Status
+                                  4: FixedColumnWidth(200), // Actions
                                 },
                                 children: [
                                   TableRow(
@@ -101,13 +101,7 @@ class Page extends StatelessWidget {
                                             padding: EdgeInsets.all(8.0),
                                             child: Text('PHÒNG'),
                                           )),
-                                      TableCell(
-                                          verticalAlignment:
-                                              TableCellVerticalAlignment.middle,
-                                          child: Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Text('MÃ THIẾT BỊ'),
-                                          )),
+
                                       TableCell(
                                           verticalAlignment:
                                               TableCellVerticalAlignment.middle,
@@ -162,16 +156,6 @@ class Page extends StatelessWidget {
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: Text(
-                                                  user.deviceUid ?? 'None'),
-                                            )),
-                                        TableCell(
-                                            verticalAlignment:
-                                                TableCellVerticalAlignment
-                                                    .middle,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
                                                   DateFormat('dd/MM/yyyy')
                                                       .format((user
                                                                   .deviceDate ??
@@ -211,7 +195,7 @@ class Page extends StatelessWidget {
                                                             user, 0);
                                                   },
                                                   child: const Text(
-                                                    'Enrollment',
+                                                    'ĐĂNG KÝ',
                                                     style: TextStyle(
                                                       fontSize: 12,
                                                     ),
@@ -247,7 +231,7 @@ class Page extends StatelessWidget {
                                                             user, 1);
                                                   },
                                                   child: const Text(
-                                                    'Attendance',
+                                                    'ĐIỂM DANH',
                                                     style: TextStyle(
                                                       fontSize: 12,
                                                     ),
@@ -367,8 +351,8 @@ class Page extends StatelessWidget {
   }
 
   void _onDelete(BuildContext context, int id) {
-    return showConfirmDialog(context, 'Delete Device',
-        'Are you sure you want to delete this device?', () {
+    return showConfirmDialog(context, 'Xóa thiết bị',
+        'Bạn có chắc chắn muốn xóa thiết bị này?', () {
       context.read<ManageDevicesCubit>().deleteDevice(id);
     });
   }

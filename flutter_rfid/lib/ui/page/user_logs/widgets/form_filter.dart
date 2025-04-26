@@ -40,7 +40,7 @@ class _FormFilterState extends State<FormFilter> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Filter Logs',
+                  'Lọc dữ liệu',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
@@ -48,12 +48,14 @@ class _FormFilterState extends State<FormFilter> {
                   color: Colors.greenAccent[100],
                   child: ListTile(
                     title: Text(_dateRange == null
-                        ? 'Select Date Range'
+                        ? 'Chọn khoảng thời gian'
                         : '${DateFormat('dd/MM/yyyy').format(_dateRange!.start)} - ${DateFormat('dd/MM/yyyy').format(_dateRange!.end)}'),
                     trailing: const Icon(Icons.calendar_today),
                     onTap: () async {
                       final DateTimeRange? result = await showDateRangePicker(
                         context: context,
+                        cancelText: 'Hủy bỏ',
+                        confirmText: 'Xác nhận',
                         firstDate: DateTime(2020),
                         lastDate: DateTime.now(),
                         currentDate: DateTime.now(),
@@ -82,7 +84,7 @@ class _FormFilterState extends State<FormFilter> {
                     return DropdownButtonFormField<String>(
                       value: _selectedDepartment,
                       decoration: const InputDecoration(
-                        labelText: 'Department',
+                        labelText: 'Phòng',
                         border: OutlineInputBorder(),
                       ),
                       items: state.departments.map((department) {
@@ -109,7 +111,7 @@ class _FormFilterState extends State<FormFilter> {
                       height: 50,
                       child: ElevatedButton.icon(
                         icon: const Icon(Icons.filter_alt),
-                        label: const Text('Apply Filter'),
+                        label: const Text('Áp dụng'),
                         onPressed: () {
                           context.read<UserLogsCubit>().applyFilters(
                                 dateRange: _dateRange,
@@ -125,7 +127,7 @@ class _FormFilterState extends State<FormFilter> {
                       height: 50,
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.filter_alt),
-                        label: const Text('Clear Filter'),
+                        label: const Text('Xóa bỏ'),
                         onPressed: () {
                           setState(() {
                             _dateRange = null;

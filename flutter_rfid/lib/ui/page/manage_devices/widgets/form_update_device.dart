@@ -43,7 +43,7 @@ class _FormUpdateDeviceState extends State<FormUpdateDevice> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.device == null ? 'Add Device' : 'Update Device'),
+        title: Text(widget.device == null ? 'THÊM THIẾT BỊ' : 'CẬP NHẬT THIẾT BỊ'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => GoRouter.of(context).pop(),
@@ -67,11 +67,11 @@ class _FormUpdateDeviceState extends State<FormUpdateDevice> {
                 children: [
                   CustomTextField(
                     controller: deviceNameController,
-                    label: 'Device Name',
-                    hintText: 'Enter your device name',
+                    label: 'Tên thiết bị',
+                    hintText: 'Nhập tên thiết bị',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter device name';
+                        return 'Vui lòng nhập tên thiết bị';
                       }
                       return null;
                     },
@@ -79,8 +79,8 @@ class _FormUpdateDeviceState extends State<FormUpdateDevice> {
                   const SizedBox(height: 16),
                   CustomTextField(
                     controller: deviceRoomController,
-                    label: 'Device Room',
-                    hintText: 'Enter your device room',
+                    label: 'Phòng',
+                    hintText: 'Nhập phòng',
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
@@ -118,7 +118,7 @@ class _FormUpdateDeviceState extends State<FormUpdateDevice> {
                           }
                         }
                       },
-                      child: const Text('Save'),
+                      child: const Text('Lưu'),
                     ),
                   ),
                 ],
