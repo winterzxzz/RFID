@@ -66,7 +66,7 @@ class _PageState extends State<Page> {
           showToast(title: state.errorMessage, type: ToastificationType.error);
         }else if (state.loadStatus == LoadStatus.success) {
           GoRouter.of(context).goNamed(AppRouter.general);
-            showToast(title: 'Welcome back!', type: ToastificationType.success);
+            showToast(title: 'Chào mừng trở lại!', type: ToastificationType.success);
           }
         }
       },
@@ -77,7 +77,7 @@ class _PageState extends State<Page> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('LOGIN', style: Theme.of(context).textTheme.headlineLarge),
+                Text('ĐĂNG NHẬP', style: Theme.of(context).textTheme.headlineLarge),
                 const SizedBox(height: 32),
                 Form(
                   child: Column(
@@ -87,7 +87,7 @@ class _PageState extends State<Page> {
                         controller: emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          hintText: 'Enter your email',
+                          hintText: 'Nhập email',
                           hintStyle: const TextStyle(
                             color: AppColors.textGray,
                             fontWeight: FontWeight.w400,
@@ -112,8 +112,8 @@ class _PageState extends State<Page> {
                         controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter your password',
+                          labelText: 'Mật khẩu',
+                          hintText: 'Nhập mật khẩu',
                           hintStyle: const TextStyle(
                             color: AppColors.textGray,
                             fontWeight: FontWeight.w400,
@@ -150,7 +150,7 @@ class _PageState extends State<Page> {
                             ),
                           ),
                           child: const Text(
-                            'Login',
+                            'ĐĂNG NHẬP',
                           ),
                         ),
                       ),

@@ -42,8 +42,6 @@ CREATE TABLE `admin` (
 -- Đang đổ dữ liệu cho bảng `admin`
 --
 
-INSERT INTO `admin` (`id`, `admin_name`, `admin_email`, `admin_pwd`) VALUES
-(1, 'admin', 'vdlaptrinh@gmail.com', '$2y$10$89uX3LBy4mlU/DcBveQ1l.32nSianDP/E1MfUh.Z.6B4Z0ql3y7PK');
 
 -- --------------------------------------------------------
 
@@ -67,10 +65,6 @@ CREATE TABLE `devices` (
 --
 -- Đang đổ dữ liệu cho bảng `devices`
 --
-
-INSERT INTO `devices` (`id`, `device_name`, `device_dep`, `device_uid`, `device_date`, `device_mode`) VALUES
-(1, 'ESP32', 'DTVT', '8f19e31055c56b05', '2021-06-21', 1),
-(3, 'ESP8266', 'DTVT 20A', '8ceb36c810343326', '2021-06-22', 1);
 
 -- --------------------------------------------------------
 
@@ -96,20 +90,7 @@ CREATE TABLE `users` (
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
-
-INSERT INTO `users` (`id`, `username`, `gender`,  `card_uid`, `card_select`, `user_date`, `add_card`) VALUES
-(2, 'Nguyen Van A', 'Male',  '911277', 0, '2021-06-21', 1),
-(4, 'Nguyen Van B', 'Female',  '4448724', 0, '2021-06-21', 1),
-(15, 'Nguyen Van C', 'Male',  '12715413', 0, '2021-06-22', 1),
-(17, 'Nguyen Van D', 'Male',  '8198525', 0, '2021-06-22', 1),
-(18, 'Nguyen Van E', 'Female',  '12715501', 1, '2021-06-22', 1),
-(30, 'Tran Van C',  'Male',  '2243724', 0, '2021-06-22', 1),
-(31, 'Tran Van A',  'Female',  '15198951', 0, '2021-06-23', 1),
-(32, 'Tran Van B',  'Female',  '12715493', 0, '2021-06-23', 1),
-(33, 'Tran Van D', 'Female',  '2249554', 0, '2021-06-23', 1),
-(34, 'Tran Van E', 'Male',  '15650647', 0, '2021-06-23', 1);
-
--- --------------------------------------------------------
+--------------------------------------------
 
 --
 -- Cấu trúc bảng cho bảng `users_logs`
@@ -203,13 +184,6 @@ CREATE TABLE `user_devices` (
   FOREIGN KEY (`device_id`) REFERENCES `devices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
-INSERT INTO user_devices (user_id, device_id, add_card, card_select, card_uid, add_date)
-VALUES 
-  (2, 3, 1, 0, '911277', '2021-06-23'),
-  (4, 3, 1, 0, '4448724', '2021-06-23'),
-  (15, 1, 1, 0, '12715413', '2021-06-23'),
-  (17, 1, 1, 0, '8198525', '2021-06-23');
 
 
 

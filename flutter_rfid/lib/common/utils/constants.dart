@@ -11,9 +11,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Constants {
   static List<HomeItem> homeItems = [
-    const HomeItem(title: 'Home', icon: FontAwesomeIcons.house),
-    const HomeItem(title: 'User Logs', icon: FontAwesomeIcons.userCheck),
-    const HomeItem(title: 'Devices', icon: FontAwesomeIcons.desktop),
-    const HomeItem(title: 'Profile', icon: FontAwesomeIcons.user),
+    const HomeItem(title: 'Trang chủ', icon: FontAwesomeIcons.house),
+    const HomeItem(title: 'Lịch sử điểm danh', icon: FontAwesomeIcons.userCheck),
+    const HomeItem(title: 'Thiết bị', icon: FontAwesomeIcons.desktop),
+    const HomeItem(title: 'Cá nhân', icon: FontAwesomeIcons.user),
   ];
 }

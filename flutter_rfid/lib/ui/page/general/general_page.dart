@@ -30,7 +30,7 @@ class _GeneralPageState extends State<GeneralPage> {
       log('attendance: $data');
       await NotificationService().showNotification(
         1,
-        'Attendance',
+        'ĐIỂM DANH',
         data['message'],
       );
     });
@@ -39,7 +39,7 @@ class _GeneralPageState extends State<GeneralPage> {
       log('add-card: $data');
       await NotificationService().showNotification(
         1,
-        'Add Card',
+        'THÊM THẺ',
         data['message'],
       );
     });
